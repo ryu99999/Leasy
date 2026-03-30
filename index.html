@@ -121,7 +121,7 @@ function PH({ title, accent, desc }) {
 
 function BCTA({ label, enabled = true, onClick, sub, onSub, icon }) {
   return (
-    <div style={{ position: "sticky", bottom: 0, padding: "12px 24px", paddingBottom: 34, background: C.w, borderTop: `1px solid ${C.g100}` }}>
+    <div style={{ flexShrink: 0, padding: "12px 24px", paddingBottom: 34, background: C.w, borderTop: `1px solid ${C.g100}` }}>
       <button onClick={enabled ? onClick : undefined} style={{
         width: "100%", height: 56, borderRadius: 16, border: "none",
         background: enabled ? C.b500 : C.g200, color: enabled ? C.w : C.g400,
