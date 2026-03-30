@@ -10,7 +10,52 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #f2f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    #root { display: flex; justify-content: center; min-height: 100vh; }
+    #root { display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; }
+
+    /* 칩 네비 — 항상 가로 스크롤 */
+    .chip-nav { -ms-overflow-style: none; scrollbar-width: none; }
+    .chip-nav::-webkit-scrollbar { display: none; }
+
+    /* 데스크탑: 중앙 정렬 프레임 */
+    .device-outer {
+      display: flex;
+      justify-content: center;
+      padding: 20px 0 40px;
+      background: #f2f4f6;
+      flex: 1;
+    }
+    .device-frame {
+      width: 393px;
+      height: 852px;
+      background: #fff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 모바일: 풀스크린 */
+    @media (max-width: 430px) {
+      body { background: #fff; }
+      #root { min-height: 100svh; }
+      .device-outer {
+        padding: 0;
+        background: #fff;
+        flex: 1;
+      }
+      .device-frame {
+        width: 100vw;
+        height: calc(100svh - var(--chip-nav-height, 0px));
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    /* 스크롤바 제거 */
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
@@ -2673,20 +2718,12 @@ function App() {
   const [accountNum, setAccountNum] = useState("");
   const [prevScreen, setPrevScreen] = useState("");
   const [completedSteps, setCompletedSteps] = useState({ contract: 1 }); // key: checkedAt order (0=not done)
-  const [resetKey, setResetKey] = useState(0);
   const completeStep = (key) => {
     setCompletedSteps(prev => {
       if (prev[key]) return prev;
       const maxAt = Math.max(0, ...Object.values(prev));
       return { ...prev, [key]: maxAt + 1 };
     });
-  };
-  const resetScreen = () => {
-    setCompletedSteps({ contract: 1 });
-    setSelectedPath("sc");
-    setBank("");
-    setAccountNum("");
-    setResetKey(k => k + 1);
   };
   const go = (s) => {
     if (s === "home") { setScreen(lastHome); return; }
@@ -2807,8 +2844,36 @@ function App() {
       background: C.g100, minHeight: "100vh",
     }}>
       {/* ─── 상단 칩 네비게이션 ─── */}
-      <style>{`.chip-nav::-webkit-scrollbar{display:none}.chip-nav{-ms-overflow-style:none;scrollbar-width:none}`}</style>
-      <div style={{
+      <style>{`
+        .chip-nav::-webkit-scrollbar{display:none}
+        .chip-nav{-ms-overflow-style:none;scrollbar-width:none}
+        .no-scrollbar::-webkit-scrollbar{display:none}
+        .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+        .no-scrollbar *::-webkit-scrollbar{display:none}
+        .no-scrollbar *{-ms-overflow-style:none;scrollbar-width:none}
+        .chip-flow-row {
+          overflow-x: auto;
+          overflow-y: hidden;
+          max-height: 80px;
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .chip-flow-row::-webkit-scrollbar { display: none; }
+        @media (max-width: 430px) {
+          .device-frame {
+            width: 100vw !important;
+            height: calc(100dvh - var(--nav-h, 88px)) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+          }
+          .device-outer {
+            padding: 0 !important;
+            justify-content: center;
+          }
+          body { background: #fff !important; }
+        }
+      `}</style>
+      <div className="chip-nav-wrapper" style={{
         position: "sticky", top: 0, zIndex: 200, background: C.w,
         borderBottom: `1px solid ${C.g200}`,
       }}>
@@ -2830,7 +2895,7 @@ function App() {
             );
           })}
         </div>
-        {/* 2단: 플로우차트 */}
+        {/* 2단: 플로우차트 — 항상 가로 스크롤 */}
         {openGroup && FLOW_DEFS[openGroup] && (() => {
           const flow = FLOW_DEFS[openGroup];
           const gc = groupColors[openGroup] || C.g600;
@@ -2838,7 +2903,7 @@ function App() {
           const disputeExtra = openGroup === "분쟁 중" ? 16 : 0;
           const H = maxN * chipH + (maxN - 1) * chipGap + 8 + disputeExtra;
           return (
-            <div className="chip-nav" style={{ display: "flex", alignItems: "stretch", padding: "0 12px 8px", overflowX: "auto" }}>
+            <div className="chip-nav chip-flow-row" style={{ display: "flex", alignItems: "stretch", padding: "0 12px 8px" }}>
               {flow.map((col, ci) => (
                 <React.Fragment key={ci}>
                   <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: (openGroup === "분쟁 중" && ci === 2) ? chipGap + disputeExtra : chipGap, height: H, flexShrink: 0, alignItems: "center", position: "relative" }}>
@@ -3230,36 +3295,19 @@ function App() {
       </div>
 
       {/* ─── 디바이스 프레임 ─── */}
-      <div style={{ display: "flex", justifyContent: "center", padding: "20px 0 40px" }}>
+      <div className="device-outer" style={{ display: "flex", justifyContent: "center", padding: "20px 0 40px", background: C.g100 }}>
         <div style={{ position: "relative" }}>
-          <div style={{
+          <div className="device-frame" style={{
             width: 393, height: 852, background: C.w,
             borderRadius: 24, overflow: "hidden",
             boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
             display: "flex", flexDirection: "column",
             position: "relative",
           }}>
-            <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}.no-scrollbar *::-webkit-scrollbar{display:none}.no-scrollbar *{-ms-overflow-style:none;scrollbar-width:none}`}</style>
-            <div key={resetKey} className="no-scrollbar" style={{ display: "flex", flexDirection: "column", flex: 1, overflowY: "auto" }}>
+            <div className="no-scrollbar" style={{ display: "flex", flexDirection: "column", flex: 1, overflowY: "auto" }}>
               {screenMap[screen]}
             </div>
           </div>
-          {/* 리셋 버튼 */}
-          <button onClick={resetScreen} title="현재 화면 초기화" style={{
-            position: "absolute", top: 12, right: -52,
-            width: 36, height: 36, borderRadius: 18,
-            background: C.g100, border: `1px solid ${C.g200}`,
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "background 0.15s",
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = C.g200}
-          onMouseLeave={e => e.currentTarget.style.background = C.g100}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M1 4v6h6M23 20v-6h-6" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
         </div>
       </div>
     </div>
@@ -3269,6 +3317,24 @@ function App() {
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
+  </script>
+
+  <script>
+    function updateChipNavHeight() {
+      const nav = document.querySelector('.chip-nav-wrapper');
+      if (nav) {
+        document.documentElement.style.setProperty('--chip-nav-height', nav.offsetHeight + 'px');
+      }
+    }
+    // Run on load and resize
+    window.addEventListener('load', updateChipNavHeight);
+    window.addEventListener('resize', updateChipNavHeight);
+    // Also observe DOM changes
+    const obs = new MutationObserver(updateChipNavHeight);
+    document.addEventListener('DOMContentLoaded', () => {
+      const nav = document.querySelector('.chip-nav-wrapper');
+      if (nav) obs.observe(nav, { childList: true, subtree: true, attributes: true });
+    });
   </script>
 </body>
 </html>
