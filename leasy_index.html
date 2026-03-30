@@ -1,0 +1,3274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Leasy</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #f2f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    #root { display: flex; justify-content: center; min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+
+
+// ═══════════════════════════════════════════════════════
+// TDS TOKENS (Single Source)
+// ═══════════════════════════════════════════════════════
+const C = {
+  // Grey
+  g50: "#f9fafb", g100: "#f2f4f6", g200: "#e5e8eb", g300: "#d1d6db",
+  g400: "#b0b8c1", g500: "#8b95a1", g600: "#6b7684", g700: "#4e5968",
+  g800: "#333d4b", g900: "#191f28",
+  // Blue
+  b50: "#e8f3ff", b100: "#c9e2ff", b200: "#90c2ff", b300: "#64a8ff",
+  b400: "#4593fc", b500: "#3182f6", b600: "#2272eb", b700: "#1b64da",
+  b800: "#1957c2", b900: "#194aa6",
+  // Red
+  r50: "#ffeeee", r100: "#ffd4d6", r200: "#feafb4", r300: "#fb8890",
+  r400: "#f66570", r500: "#f04452", r600: "#e42939", r700: "#d22030",
+  r800: "#bc1b2a", r900: "#a51926",
+  // Green
+  gn50: "#f0faf6", gn100: "#aeefd5", gn200: "#76e4b8", gn300: "#3fd599",
+  gn400: "#15c47e", gn500: "#03b26c", gn600: "#02a262", gn700: "#029359",
+  gn800: "#028450", gn900: "#027648",
+  // Orange
+  o50: "#fff3e0", o100: "#ffe0b0", o200: "#ffcd80", o300: "#ffbd51",
+  o400: "#ffa927", o500: "#fe9800", o600: "#fb8800", o700: "#f57800",
+  o800: "#ed6700", o900: "#e45600",
+  // Yellow
+  y50: "#fff9e7", y100: "#ffefbf", y200: "#ffe69b", y300: "#ffdd78",
+  y400: "#ffd158", y500: "#ffc342", y600: "#ffb331", y700: "#faa131",
+  y800: "#ee8f11", y900: "#dd7d02",
+  // Teal
+  t50: "#edf8f8", t100: "#bce9e9", t200: "#89d8d8", t300: "#58c7c7",
+  t400: "#30b6b6", t500: "#18a5a5", t600: "#109595", t700: "#0c8585",
+  t800: "#097575", t900: "#076565",
+  // Purple
+  p50: "#f9f0fc", p100: "#edccf8", p200: "#da9bef", p300: "#c770e4",
+  p400: "#b44bd7", p500: "#a234c7", p600: "#9128b4", p700: "#8222a2",
+  p800: "#73228e", p900: "#65237b",
+  // Background
+  w: "#FFFFFF",
+  bg: "#FFFFFF",
+  greyBg: "#f2f4f6",
+};
+
+const T = {
+  t2: (w = 700) => ({ fontSize: 26, lineHeight: "35px", fontWeight: w }),
+  t3: (w = 600) => ({ fontSize: 22, lineHeight: "31px", fontWeight: w }),
+  t4: (w = 600) => ({ fontSize: 20, lineHeight: "29px", fontWeight: w }),
+  t5: (w = 500) => ({ fontSize: 17, lineHeight: "25.5px", fontWeight: w }),
+  t6: (w = 400) => ({ fontSize: 15, lineHeight: "22.5px", fontWeight: w }),
+  t7: (w = 400) => ({ fontSize: 13, lineHeight: "19.5px", fontWeight: w }),
+  s13: (w = 400) => ({ fontSize: 11, lineHeight: "16.5px", fontWeight: w }),
+};
+
+const contract = {
+  address: "서울시 마포구 연남로 12길 34, 301호",
+  deposit: "1,000만원", rent: "55만원",
+  period: "2025.04.01 ~ 2027.04.01", expiry: "2027.04.01",
+  daysLeft: 247, landlord: "김OO", tenant: "이지은",
+  landlordAddr: "서울시 강남구 테헤란로 123, 456호",
+  court: "서울서부지방법원", courtAddr: "서울시 마포구 마포대로 174",
+};
+
+// ═══════════════════════════════════════════════════════
+// SHARED COMPONENTS
+// ═══════════════════════════════════════════════════════
+function SBar() {
+  return (
+    <div style={{ height: 59, background: C.w, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: 14 }}>
+      <div style={{ width: 126, height: 37, background: C.g900, borderRadius: 19 }} />
+    </div>
+  );
+}
+
+function Nav({ title, onBack }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", height: 44, padding: "0 24px" }}>
+      {onBack && (
+        <button onClick={onBack} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 19l-7-7 7-7" stroke={C.g900} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function PH({ title, accent, desc }) {
+  return (
+    <div style={{ padding: "24px 24px 0" }}>
+      <div style={{ marginBottom: desc ? 8 : 0 }}>
+        <span style={{ ...T.t2(700), color: C.g900 }}>{title}</span>
+        {accent && <span style={{ ...T.t2(700), color: C.b500, display: "block" }}>{accent}</span>}
+      </div>
+      {desc && <span style={{ ...T.t6(400), color: C.g600, display: "block", wordBreak: "keep-all", whiteSpace: "pre-line", textWrap: "balance" }}>{desc}</span>}
+    </div>
+  );
+}
+
+function BCTA({ label, enabled = true, onClick, sub, onSub, icon }) {
+  return (
+    <div style={{ position: "sticky", bottom: 0, padding: "12px 24px", paddingBottom: 34, background: C.w, borderTop: `1px solid ${C.g100}` }}>
+      <button onClick={enabled ? onClick : undefined} style={{
+        width: "100%", height: 56, borderRadius: 16, border: "none",
+        background: enabled ? C.b500 : C.g200, color: enabled ? C.w : C.g400,
+        cursor: enabled ? "pointer" : "default", ...T.t5(600),
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+      }}>{label}{icon}</button>
+      {sub && <div style={{ textAlign: "center", marginTop: 12 }}><button onClick={onSub || onClick} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 16px", ...T.t6(500), color: C.g500 }}>{sub}</button></div>}
+    </div>
+  );
+}
+
+function IC({ bg, children, size = 44 }) {
+  return (
+    <div style={{ width: size, height: size, borderRadius: size / 2, background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{children}</div>
+  );
+}
+
+function Chev() {
+  return <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke={C.g300} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+}
+
+function Dv() { return <div style={{ height: 8, background: C.g50, margin: "24px 0" }} />; }
+
+function SelBtn({ selected, onClick, children, style: sx }) {
+  return (
+    <button onClick={onClick} style={{
+      width: "100%", textAlign: "left", cursor: "pointer", padding: "16px 20px", background: C.w,
+      borderRadius: 16, border: `1.5px solid ${C.g200}`, display: "flex", alignItems: "center", gap: 16,
+      ...sx,
+    }}>{children}</button>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// SCREEN REGISTRY
+// ═══════════════════════════════════════════════════════
+const SCREENS = {
+  // ── 계약 전 ──
+  home_pre: { label: "홈", group: "계약 전" },
+  a0_capture: { label: "촬영", group: "계약 전" },
+  a0_extracted: { label: "추출 확인", group: "계약 전" },
+  a0_review: { label: "검토 결과", group: "계약 전" },
+  home_checked: { label: "검토 완료", group: "계약 전" },
+  agent_rec: { label: "중개사 추천", group: "계약 전" },
+  // ── 계약 직후 ──
+  home_post: { label: "홈", group: "계약 직후" },
+  a3: { label: "전입신고", group: "계약 직후" },
+  a2: { label: "보증금 진단", group: "계약 직후" },
+  a4_1: { label: "촬영 브리핑", group: "계약 직후" },
+  a4_guide: { label: "가이드 촬영", group: "계약 직후" },
+  a4_free: { label: "자유 촬영", group: "계약 직후" },
+  a4_confirm: { label: "사진 확인", group: "계약 직후" },
+  a4_2: { label: "전송", group: "계약 직후" },
+  a4_sent: { label: "전송 완료", group: "계약 직후" },
+  home_post_done: { label: "보호 완료", group: "계약 직후" },
+  // ── 거주 중 ──
+  home_live: { label: "홈", group: "거주 중" },
+  // ── 만기 접근 ──
+  home_expiry: { label: "홈", group: "만기 접근" },
+  b1a_main: { label: "퇴거·연장", group: "만기 접근" },
+  b1a_exit: { label: "퇴거 통보", group: "만기 접근" },
+  b1a_exit_sent: { label: "퇴거 통보 확인", group: "만기 접근" },
+  b1a_renew: { label: "연장 안내", group: "만기 접근" },
+  home_expiry_done: { label: "홈(대응결과 입력 전)", group: "만기 접근" },
+  home_exit_done: { label: "홈(퇴거통보완료)", group: "만기 접근" },
+  b1a_result: { label: "대응 결과", group: "만기 접근" },
+  __nav_live: { label: "거주 중", group: "만기 접근" },
+  __nav_exit_back: { label: "퇴거 통보", group: "만기 접근" },
+  __nav_postexpiry: { label: "만기 도래", group: "만기 접근" },
+  // ── 만기 도래 ──
+  home_postexpiry: { label: "홈", group: "만기 도래" },
+  b1b_main: { label: "반환 확인", group: "만기 도래" },
+  b1b_dispute: { label: "미반환 안내", group: "만기 도래" },
+  // ── 분쟁 중 ──
+  home_dispute: { label: "홈", group: "분쟁 중" },
+  home_dispute_pending: { label: "홈(발송대기)", group: "분쟁 중" },
+  b2a: { label: "연락 확인", group: "분쟁 중" },
+  b2b: { label: "반환 의사", group: "분쟁 중" },
+  b2b_agree: { label: "합의 안내", group: "분쟁 중" },
+  b2b_agree_sent: { label: "합의 확인", group: "분쟁 중" },
+  home_agree_wait: { label: "홈(합의대기)", group: "분쟁 중" },
+  b2b_return: { label: "반환 확인", group: "분쟁 중" },
+  b21_compose: { label: "내용증명 작성", group: "분쟁 중" },
+  b21_preview: { label: "반환요청서 생성", group: "분쟁 중" },
+  b21_sent: { label: "발송 완료", group: "분쟁 중" },
+  home_dispute_sent: { label: "홈(발송 후)", group: "분쟁 중" },
+  b4: { label: "분쟁 경로", group: "분쟁 중" },
+  b3_sc: { label: "서류·소액심판", group: "분쟁 중" },
+  b3_po: { label: "서류·지급명령", group: "분쟁 중" },
+  b3_med: { label: "서류·분쟁조정", group: "분쟁 중" },
+  b3_move: { label: "서류·이사예정", group: "분쟁 중" },
+  home_done: { label: "계약 마무리", group: "만기 도래" },
+  // ── 네비게이션 칩 (그라데이션) ──
+  __nav_done: { label: "계약 마무리", group: "분쟁 중" },
+};
+
+const GROUPS = ["계약 전", "계약 직후", "거주 중", "만기 접근", "만기 도래", "분쟁 중"];
+
+// ═══════════════════════════════════════════════════════
+// HOME SCREEN
+// ═══════════════════════════════════════════════════════
+
+function HomeScreen({ go, phase, completedSteps = {}, completeStep = () => {} }) {
+  // 계약 직후 → 보호 완료 인터스티셜 (체크리스트 4개 모두 완료 시)
+  const allPostStepsDone = completedSteps.movein && completedSteps.a2 && completedSteps.a4 && completedSteps.contract;
+  useEffect(() => {
+    if (phase === "계약 직후" && allPostStepsDone) {
+      const t = setTimeout(() => go("home_post_done"), 600);
+      return () => clearTimeout(t);
+    }
+  }, [phase, allPostStepsDone]);
+
+  const immunity = phase === "계약 전" || phase === "계약 확인 완료" || phase === "계약 직후"
+    ? { m: false, f: false, e: false }
+    : { m: true, f: true, e: true };
+  const showContract = phase !== "계약 전" && phase !== "계약 확인 완료";
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+
+  const nextAction = () => {
+    if (phase === "계약 전") return { title: "계약서를 등록하세요", desc: "계약서를 촬영하면 위험 요소를 자동으로 분석해드려요", btn: "계약서 촬영하기", color: C.b500, bg: C.b50, iconBg: C.b500, go: "a0_capture" };
+    if (phase === "계약 직후") return { title: "보증금 보호 상태를 확인하세요", desc: "내 보증금이 안전한지 먼저 점검해야 해요", btn: "진단 결과 보기", color: C.b500, bg: C.b50, iconBg: C.b500, go: "a2" };
+    if (phase === "만기 접근") return { title: "만기가 다가오고 있어요", desc: "연장 또는 퇴거를 결정해야 해요", btn: "만기 대응 시작하기", color: C.o500, bg: C.o50, iconBg: C.o500, go: "b1a_main" };
+    if (phase === "만기 대응 중") return { title: "만기 대응은 어떻게 되었나요?", desc: "연장 또는 퇴거 결과를 알려주세요", btn: "대응 결과 알려주기", color: C.b500, bg: C.b50, iconBg: C.b500, go: "b1a_result" };
+    if (phase === "퇴거 신청 완료") return { title: "퇴거 통보를 보냈어요", desc: "만기일까지 퇴거 준비를 진행하세요", btn: null, color: null, bg: C.b50, iconBg: C.b500 };
+    if (phase === "만기 도래") return { title: "보증금을 돌려받으셨나요?", desc: "만기일이 지났어요. 반환 여부를 확인해주세요", btn: "반환 여부 확인하기", color: C.o500, bg: C.o50, iconBg: C.o500, go: "b1b_main" };
+    if (phase === "분쟁 중") return { title: "보증금 반환을 요청하세요", desc: "집주인 연락 상태부터 확인하고 단계별로 안내해드려요", btn: "대응 절차 시작하기", color: C.r500, bg: C.r50, iconBg: C.r500, go: "b2a" };
+    if (phase === "발송 대기") return { title: "인터넷우체국에서 발송했나요?", desc: "반환 요청서가 준비되어 있어요. 발송 후 알려주세요", btn: "발송 여부 알려주기", color: C.r500, bg: C.r50, iconBg: C.r500, go: "b21_sent" };
+    if (phase === "합의 대기") return { title: "보증금을 돌려받으셨나요?", desc: "합의한 날짜가 지났다면 반환 여부를 확인해주세요", btn: "반환 여부 확인하기", color: C.b500, bg: C.b50, iconBg: C.b500, go: "b2b_return" };
+    if (phase === "내용증명 발송 완료") return { title: "내용증명을 보냈어요", desc: "반환 기한(14일) 내 응답이 없으면 다음 단계로 진행할 수 있어요", btn: "다음 단계 확인하기", color: C.r500, bg: C.r50, iconBg: C.r500, go: "b4" };
+    if (phase === "계약 마무리") return { title: "계약이 마무리됐어요", desc: "보증금 반환까지 모든 절차가 완료됐어요", btn: null, color: null, bg: C.gn50, iconBg: C.gn500 };
+    return { title: "법적 보호가 갖춰진 상태입니다", desc: "전입신고, 확정일자, 입주 기록 전송이 모두 완료됐어요", btn: null, color: null, bg: C.b50, iconBg: C.b500 };
+  };
+  const na = nextAction();
+
+  // TDS-style SVG icons for ACard / PartnerSection
+  const IC20 = (svg) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none">{svg}</svg>;
+  const ICONS = {
+    won: IC20(<><circle cx="12" cy="12" r="10" stroke={C.b500} strokeWidth="1.8"/><path d="M7 9l2.5 7L12 10l2.5 6L17 9" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+    doc: IC20(<><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+    cam: IC20(<><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="13" r="4" stroke={C.b500} strokeWidth="1.8"/></>),
+    chart: IC20(<><path d="M18 20V10M12 20V4M6 20v-6" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+    flame: IC20(<><path d="M12 22c4-2 7-6 7-10 0-3-2-5-3-6-1 2-3 3-4 3-1-3 0-7 0-7-2 2-5 5-5 10 0 4 2 8 5 10z" stroke={C.o500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+    shield: IC20(<><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke={C.gn500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 12l2 2 4-4" stroke={C.gn500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+    house: IC20(<><path d="M3 9.5L12 3l9 6.5V20a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 20V9.5z" stroke={C.b500} strokeWidth="1.8" strokeLinejoin="round"/><path d="M9 21.5V14h6v7.5" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+    truck: IC20(<><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z" stroke={C.g900} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="5.5" cy="18.5" r="2.5" stroke={C.g900} strokeWidth="1.8"/><circle cx="18.5" cy="18.5" r="2.5" stroke={C.g900} strokeWidth="1.8"/></>),
+    scale: IC20(<><path d="M12 3v18M5 7l7-4 7 4" stroke={C.g700} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 7L3 15h4L5 7M19 7l-2 8h4l-2-8" stroke={C.g700} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+    docGrey: IC20(<><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></>),
+  };
+
+  const ACard = ({ icon, title, desc, target }) => (
+    <div>
+      <div onClick={() => target && go(target)} style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px 24px", cursor: target ? "pointer" : "default" }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: C.g50, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ ...T.t6(500), color: C.g900, marginBottom: 2 }}>{title}</div>
+          <span style={{ ...T.t7(400), color: C.g500 }}>{desc}</span>
+        </div>
+        <Chev />
+      </div>
+      <div style={{ height: 1, background: C.g100, margin: "0 24px" }} />
+    </div>
+  );
+
+  const partnersByPhase = {
+    "거주 중": [
+      { icon: ICONS.flame, title: "화재보험 가입", desc: "월 2,000원대부터 가입 가능", partner: "삼성화재" },
+      { icon: ICONS.shield, title: "보증보험 가입 확인", desc: "보증금을 추가로 보호할 수 있어요", partner: "HUG" },
+    ],
+    "만기 접근": [
+      { icon: ICONS.house, title: "새 집 찾기", desc: "내 조건에 맞는 매물을 확인해보세요", partner: "직방" },
+      { icon: ICONS.truck, title: "이사 견적 비교", desc: "업체별 견적을 한번에 비교해요", partner: "짐싸" },
+    ],
+    "퇴거 신청 완료": [
+      { icon: ICONS.house, title: "새 집 찾기", desc: "내 조건에 맞는 매물을 확인해보세요", partner: "직방" },
+      { icon: ICONS.truck, title: "이사 견적 비교", desc: "업체별 견적을 한번에 비교해요", partner: "짐싸" },
+    ],
+    "만기 도래": [
+      { icon: ICONS.scale, title: "법률 상담 연결", desc: "보증금 반환 관련 무료 상담", partner: "법률구조공단" },
+      { icon: ICONS.truck, title: "이사 견적 비교", desc: "업체별 견적을 한번에 비교해요", partner: "짐싸" },
+    ],
+    "분쟁 중": [
+      { icon: ICONS.scale, title: "변호사 상담 연결", desc: "보증금 분쟁 전문 변호사 매칭", partner: "로톡" },
+      { icon: ICONS.docGrey, title: "임차권등기 서류 대행", desc: "복잡한 서류 준비를 대신해드려요", partner: "법무통" },
+    ],
+  };
+
+  const PartnerSection = ({ phaseKey }) => {
+    const items = partnersByPhase[phaseKey];
+    if (!items) return null;
+    return (
+      <>
+        <div style={{ padding: "20px 24px 8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ ...T.t6(500), color: C.g600 }}>이런 서비스도 있어요</span>
+          <span style={{ ...T.s13(400), color: C.g400 }}>제휴</span>
+        </div>
+        {items.map((p, i) => (
+          <div key={i}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px 24px", cursor: "pointer" }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.g50, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{p.icon}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                  <span style={{ ...T.t6(500), color: C.g900 }}>{p.title}</span>
+                  <span style={{ ...T.s13(400), color: C.g400, background: C.g100, padding: "1px 6px", borderRadius: 4 }}>{p.partner}</span>
+                </div>
+                <span style={{ ...T.t7(400), color: C.g500 }}>{p.desc}</span>
+              </div>
+              <Chev />
+            </div>
+            {i < items.length - 1 && <div style={{ height: 1, background: C.g100, margin: "0 24px" }} />}
+          </div>
+        ))}
+      </>
+    );
+  };
+
+  return (
+    <>
+      <SBar />
+      {/* Home Navbar */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", height: 44, padding: "0 24px" }}>
+        <span style={{ ...T.t4(600), color: C.g900 }}>내 계약</span>
+        <div style={{ display: "flex", gap: 12 }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke={C.g700} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </div>
+      </div>
+
+      {/* 계약 전 — 빈 상태 (단일 메시지 + 단일 CTA) */}
+      {phase === "계약 전" && (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", minHeight: 480 }}>
+          <div style={{ width: 56, height: 56, borderRadius: 16, background: C.b50, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div style={{ ...T.t3(600), color: C.g900, textAlign: "center", marginBottom: 8 }}>계약서를 등록해보세요</div>
+          <div style={{ ...T.t6(400), color: C.g500, textAlign: "center", marginBottom: 28 }}>촬영하면 위험 요소를 자동으로 찾아드려요</div>
+          <button onClick={() => go("a0_capture")} style={{
+            padding: "14px 36px", background: C.b500, color: C.w,
+            border: "none", borderRadius: 12, cursor: "pointer", ...T.t6(600),
+          }}>계약서 촬영하기</button>
+          <button onClick={() => go("agent_rec")} style={{
+            background: "none", border: "none", padding: "12px 0 0", cursor: "pointer",
+            ...T.t7(400), color: C.g400, textDecoration: "underline",
+          }}>인근 공인중개사 찾기</button>
+        </div>
+      )}
+
+      {/* 계약 확인 완료 — 검토 완료 후 계약 진행 중 상태 */}
+      {phase === "계약 확인 완료" && (
+        <div style={{ minHeight: 640, display: "flex", flexDirection: "column", padding: "0 24px" }}>
+          <div style={{ padding: "32px 0 20px" }}>
+            <div style={{ width: 56, height: 56, borderRadius: 16, background: C.b50, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M14 2v6h6" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M8.5 14l2 2 5-5" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div style={{ ...T.t3(700), color: C.g900, marginBottom: 8 }}>계약서 검토 완료</div>
+            <div style={{ ...T.t6(400), color: C.g500, wordBreak: "keep-all", whiteSpace: "pre-line", textWrap: "balance" }}>{"검토 결과를 참고해서 계약을 진행하세요.\n계약이 끝나면 알려주세요."}</div>
+          </div>
+          {/* 검토 결과 다시 보기 카드 */}
+          <div onClick={() => go("a0_review")} style={{ background: C.g50, borderRadius: 12, padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}>
+            <div>
+              <div style={{ ...T.t6(600), color: C.g900 }}>검토 결과 다시 보기</div>
+              <div style={{ ...T.s13(400), color: C.g500, marginTop: 4 }}>주의 1개 · 누락 2개</div>
+            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18l6-6-6-6" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div style={{ flex: 1 }} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingBottom: 12 }}>
+            <SelBtn onClick={() => go("home_post")}>
+              <IC bg={C.b50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke={C.b500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+              <div style={{ flex: 1 }}>
+                <div style={{ ...T.t6(500), color: C.g900 }}>계약 완료했어요</div>
+                <div style={{ ...T.t7(400), color: C.g500 }}>보증금 보호 절차를 시작해요</div>
+              </div>
+              <Chev />
+            </SelBtn>
+            <SelBtn onClick={() => go("agent_rec")}>
+              <IC bg={C.g100}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={C.g500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+              <div style={{ flex: 1 }}>
+                <div style={{ ...T.t6(500), color: C.g900 }}>이 계약 안 하기로 했어요</div>
+                <div style={{ ...T.t7(400), color: C.g500 }}>다른 매물을 찾아볼 수 있어요</div>
+              </div>
+              <Chev />
+            </SelBtn>
+          </div>
+        </div>
+      )}
+
+      {/* 계약 이후 */}
+      {showContract && (
+        <>
+          {/* 계약 요약 카드 — TDS Simplicity 구조 */}
+          <div style={{ padding: "8px 24px 12px" }}>
+            <div style={{ background: C.w, borderRadius: 16, border: `1px solid ${C.g300}`, overflow: "hidden" }}>
+              {/* 상단: 주소 + 금액 인라인 + 만기 */}
+              <div style={{ padding: "20px 20px 16px" }}>
+                <div style={{ ...T.t7(400), color: C.g500, marginBottom: 12 }}>{contract.address}</div>
+                <div style={{ marginBottom: 4 }}>
+                  <span style={{ ...T.t5(400), color: C.g600 }}>보증금 </span>
+                  <span style={{ ...T.t4(700), color: C.g900 }}>{contract.deposit}</span>
+                  <span style={{ ...T.t5(400), color: C.g400 }}> · </span>
+                  <span style={{ ...T.t5(400), color: C.g600 }}>월세 </span>
+                  <span style={{ ...T.t4(700), color: C.g900 }}>{contract.rent}</span>
+                </div>
+                {/* 만기 + D-day */}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12 }}>
+                  <span style={{ ...T.s13(400), color: C.g500 }}>만기 {contract.expiry}</span>
+                  <span style={{
+                    ...T.s13(600), padding: "2px 6px", borderRadius: 4,
+                    color: phase === "계약 마무리" ? C.gn600 : phase === "만기 도래" || phase === "분쟁 중" || phase === "발송 대기" || phase === "내용증명 발송 완료" ? C.r500 : phase === "만기 접근" || phase === "만기 대응 중" || phase === "퇴거 신청 완료" ? C.o600 : C.b500,
+                    background: phase === "계약 마무리" ? C.gn50 : phase === "만기 도래" || phase === "분쟁 중" || phase === "발송 대기" || phase === "내용증명 발송 완료" ? C.r50 : phase === "만기 접근" || phase === "만기 대응 중" || phase === "퇴거 신청 완료" ? C.o50 : C.b50,
+                  }}>{phase === "계약 마무리" ? "마무리" : phase === "만기 도래" ? "D+2" : phase === "분쟁 중" || phase === "발송 대기" || phase === "합의 대기" ? "D+2" : phase === "내용증명 발송 완료" ? "D+5" : phase === "만기 접근" || phase === "만기 대응 중" || phase === "퇴거 신청 완료" ? "D-67" : `D-${contract.daysLeft}`}</span>
+                </div>
+              </div>
+              {/* 하단: 보호 상태 — 배경 분리로 영역 구분 */}
+              {phase !== "계약 직후" && (() => {
+                const done = [immunity.m, immunity.f, immunity.e].filter(Boolean).length;
+                const total = 3;
+                const allDone = done === total;
+                return (
+                  <div style={{ padding: "16px 20px", background: C.g50, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {[{ l: "전입신고", d: immunity.m }, { l: "확정일자", d: immunity.f }, { l: "증거전송", d: immunity.e }].map((b, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                          <div style={{
+                            width: 14, height: 14, borderRadius: 7, flexShrink: 0,
+                            background: b.d ? C.b500 : C.w,
+                            border: b.d ? "none" : `1.5px solid ${C.g400}`,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                          }}>
+                            {b.d && <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 5.5l2.5 2.5L8 3" stroke={C.w} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                          </div>
+                          <span style={{ ...T.s13(400), color: b.d ? C.g700 : C.g500 }}>{b.l}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <span style={{
+                      ...T.s13(600),
+                      color: allDone ? C.b500 : C.g500,
+                    }}>{done}/{total}</span>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* One Next Action — 계약 직후는 체크리스트가 대체 */}
+          {phase !== "계약 직후" && !(!na.btn && noticeDismissed) && (
+            <div style={{ padding: "0 24px 16px" }}>
+              <div style={{ background: na.bg, borderRadius: 16, padding: "20px 20px 16px", position: "relative" }}>
+                {!na.btn && <button onClick={() => setNoticeDismissed(true)} style={{ position: "absolute", top: 12, right: 12, width: 28, height: 28, borderRadius: 14, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></button>}
+                <div style={{ ...T.t6(600), color: C.g900, marginBottom: 4, paddingRight: !na.btn ? 28 : 0 }}>{na.title}</div>
+                <div style={{ ...T.t7(400), color: C.g600, marginBottom: na.btn ? 16 : 0 }}>{na.desc}</div>
+                {na.btn && <button onClick={() => na.go && go(na.go)} style={{ width: "100%", padding: "14px 0", background: na.color, color: C.w, border: "none", borderRadius: 12, cursor: "pointer", ...T.t6(600) }}>{na.btn}</button>}
+              </div>
+            </div>
+          )}
+
+          {/* 계약 직후 — 체크리스트 */}
+          {phase === "계약 직후" && (() => {
+            const items = [
+              { key: "movein", title: "전입신고 + 확정일자", desc: "빨리 할수록 보증금 보호가 강해져요", order: 0, badge: "먼저", target: "a3" },
+              { key: "a2", title: "보증금 보호 상태 확인", desc: "내 보증금이 안전한지 확인해보세요", order: 1, target: "a2" },
+              { key: "a4", title: "입주 사진 촬영 + 전송", desc: "사진을 찍고 문자로 보내야 증거가 돼요", order: 2, target: "a4_1" },
+              { key: "contract", title: "계약서 검토 완료", desc: "완료", order: 3, target: "a0_review" },
+            ].map(item => ({
+              ...item,
+              done: !!completedSteps[item.key],
+              checkedAt: completedSteps[item.key] || 0,
+            })).sort((a, b) => {
+              if (a.done !== b.done) return a.done ? 1 : -1;
+              if (a.done && b.done) return b.checkedAt - a.checkedAt;
+              return a.order - b.order;
+            });
+
+            return (
+              <div style={{ padding: "20px 24px 0" }}>
+                <div style={{ background: C.b50, borderRadius: 16, padding: "16px 20px", marginBottom: 20 }}>
+                  <div style={{ ...T.t6(600), color: C.b700, marginBottom: 4 }}>보증금이 아직 보호되지 않았어요</div>
+                  <div style={{ ...T.t7(400), color: C.g600 }}>전입신고하면 {contract.deposit}을 지킬 수 있어요</div>
+                </div>
+                <div style={{ ...T.t6(500), color: C.g600, marginBottom: 16 }}>입주 보호 절차</div>
+                {items.map((s) => (
+                  <div key={s.key} style={{ display: "flex", gap: 16, marginBottom: 20, cursor: "pointer" }}
+                    onClick={() => {
+                      if (s.done && s.target) { go(s.target); return; }
+                      if (s.target) { go(s.target); return; }
+                      if (s.onTap) s.onTap();
+                    }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", width: 24, paddingTop: 2 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: 12,
+                        background: s.done ? C.b500 : C.w,
+                        border: s.done ? "none" : `2px solid ${C.b500}`,
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        {s.done && <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                        <span style={{ ...T.t6(500), color: s.done ? C.g400 : C.g900 }}>{s.title}</span>
+                        {s.badge && !s.done && <span style={{ ...T.s13(600), color: C.b600, background: C.b50, padding: "2px 8px", borderRadius: 8 }}>{s.badge}</span>}
+                      </div>
+                      <div style={{ ...T.t7(400), color: s.done ? C.g300 : C.g500 }}>{s.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
+          {/* 거주 중 */}
+          {phase === "거주 중" && (
+            <>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.won} title="월세가 인상되었나요?" desc="법적으로 5% 이상 올릴 수 없어요" />
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <ACard icon={ICONS.chart} title="리스크 진단 리포트" desc="내 계약의 보호 상태를 다시 확인하세요" />
+              <PartnerSection phaseKey="거주 중" />
+            </>
+          )}
+
+          {/* 만기 접근 */}
+          {(phase === "만기 접근" || phase === "만기 대응 중" || phase === "퇴거 신청 완료") && (
+            <>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.won} title="월세가 인상되었나요?" desc="법적으로 5% 이상 올릴 수 없어요" />
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <ACard icon={ICONS.chart} title="리스크 진단 리포트" desc="내 계약의 보호 상태를 다시 확인하세요" />
+              <PartnerSection phaseKey={phase === "퇴거 신청 완료" ? "퇴거 신청 완료" : "만기 접근"} />
+            </>
+          )}
+
+          {/* 만기 도래 */}
+          {phase === "만기 도래" && (
+            <>
+              <div style={{ padding: "24px 24px 16px" }}>
+                <div style={{ ...T.t6(500), color: C.g600 }}>퇴거 진행 현황</div>
+              </div>
+              <div style={{ padding: "4px 24px 20px" }}>
+                {[
+                  { title: "퇴거 의사 통보", desc: "2027.02.01 내용증명 발송", done: true },
+                  { title: "보증금 반환 확인", desc: "돌려받았는지 확인이 필요해요", done: false, target: "b1b_main" },
+                ].map((s, i, arr) => (
+                  <div key={i} style={{ display: "flex", gap: 16 }} onClick={() => s.target && go(s.target)}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: 12,
+                        background: s.done ? C.b500 : C.w,
+                        border: s.done ? "none" : `2px solid ${C.b500}`,
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        {s.done && <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+
+                      </div>
+                      {i < arr.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 28, background: s.done ? C.b500 : C.g200, marginTop: 4, marginBottom: 4, borderRadius: 1, opacity: s.done ? 0.4 : 1 }} />}
+                    </div>
+                    <div style={{ flex: 1, paddingBottom: i < arr.length - 1 ? 24 : 0, cursor: s.target ? "pointer" : "default" }}>
+                      <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>{s.title}</div>
+                      <div style={{ ...T.t7(400), color: s.done ? C.g400 : C.g500 }}>{s.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.won} title="월세가 인상되었나요?" desc="법적으로 5% 이상 올릴 수 없어요" />
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <ACard icon={ICONS.chart} title="리스크 진단 리포트" desc="내 계약의 보호 상태를 다시 확인하세요" />
+              <PartnerSection phaseKey="만기 도래" />
+            </>
+          )}
+
+          {/* 합의 대기 */}
+          {phase === "합의 대기" && (
+            <>
+              <div style={{ padding: "24px 24px 16px" }}>
+                <div style={{ ...T.t6(500), color: C.g600 }}>분쟁 대응 현황</div>
+              </div>
+              <div style={{ padding: "4px 24px 20px" }}>
+                {[
+                  { title: "퇴거 의사 통보", desc: "2027.02.01 발송", done: true },
+                  { title: "집주인 연락 확인", desc: "반환 의사 확인 완료", done: true },
+                  { title: "반환 합의 기록", desc: "문자로 합의 내용 전송 완료", done: true },
+                  { title: "보증금 반환 확인", desc: "돌려받았는지 확인이 필요해요", done: false, target: "b2b_return" },
+                  { title: "반환 기한 대기", desc: "합의 날짜까지 대기", done: false },
+                ].map((s, i, arr) => (
+                  <div key={i} style={{ display: "flex", gap: 16 }} onClick={() => s.target && go(s.target)}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: 12,
+                        background: s.done ? C.b500 : C.w,
+                        border: s.done ? "none" : `2px solid ${C.b500}`,
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        {s.done && <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                      </div>
+                      {i < arr.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 28, background: s.done ? C.b500 : C.g200, marginTop: 4, marginBottom: 4, borderRadius: 1, opacity: s.done ? 0.4 : 1 }} />}
+                    </div>
+                    <div style={{ flex: 1, paddingBottom: i < arr.length - 1 ? 24 : 0, cursor: s.target ? "pointer" : "default" }}>
+                      <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>{s.title}</div>
+                      <div style={{ ...T.t7(400), color: s.done ? C.g400 : C.g500 }}>{s.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <PartnerSection phaseKey="분쟁 중" />
+            </>
+          )}
+
+          {phase === "분쟁 중" && (
+            <>
+              <div style={{ padding: "24px 24px 16px" }}>
+                <div style={{ ...T.t6(500), color: C.g600 }}>분쟁 대응 현황</div>
+              </div>
+              <div style={{ padding: "4px 24px 20px" }}>
+                {[
+                  { title: "퇴거 의사 통보", desc: "2027.02.01 발송", done: true },
+                  { title: "집주인 연락 확인", desc: "연락 가능 여부를 먼저 파악해요", done: false },
+                  { title: "반환 요청서 작성", desc: "내용증명으로 공식 요청하세요", done: false },
+                  { title: "내용증명 발송", desc: "인터넷우체국에서 발송하세요", done: false },
+                  { title: "반환 기한 대기", desc: "발송 후 14일간 대기", done: false },
+                ].map((s, i, arr) => (
+                  <div key={i} style={{ display: "flex", gap: 16 }} onClick={() => s.target && go(s.target)}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: 12,
+                        background: s.done ? C.b500 : C.w,
+                        border: s.done ? "none" : `2px solid ${C.b500}`,
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        {s.done && <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+
+                      </div>
+                      {i < arr.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 28, background: s.done ? C.b500 : C.g200, marginTop: 4, marginBottom: 4, borderRadius: 1, opacity: s.done ? 0.4 : 1 }} />}
+                    </div>
+                    <div style={{ flex: 1, paddingBottom: i < arr.length - 1 ? 24 : 0, cursor: s.target ? "pointer" : "default" }}>
+                      <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>{s.title}</div>
+                      <div style={{ ...T.t7(400), color: s.done ? C.g400 : C.g500, marginBottom: !s.done && s.target ? 10 : 0 }}>{s.desc}</div>
+                      {!s.done && s.target && (
+                        <button style={{ padding: "12px 20px", background: C.b500, color: C.w, border: "none", borderRadius: 12, cursor: "pointer", ...T.t7(500) }}>경로 비교하기</button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.won} title="월세가 인상되었나요?" desc="법적으로 5% 이상 올릴 수 없어요" />
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <ACard icon={ICONS.chart} title="리스크 진단 리포트" desc="내 계약의 보호 상태를 다시 확인하세요" />
+              <PartnerSection phaseKey="분쟁 중" />
+            </>
+          )}
+
+          {/* 발송 대기 */}
+          {phase === "발송 대기" && (
+            <>
+              <div style={{ padding: "24px 24px 16px" }}>
+                <div style={{ ...T.t6(500), color: C.g600 }}>분쟁 대응 현황</div>
+              </div>
+              <div style={{ padding: "4px 24px 20px" }}>
+                {[
+                  { title: "퇴거 의사 통보", desc: "2027.02.01 발송", done: true },
+                  { title: "집주인 연락 확인", desc: "연락 불가 확인", done: true },
+                  { title: "반환 요청서 작성", desc: "작성 완료", done: true },
+                  { title: "내용증명 발송", desc: "인터넷우체국에서 발송하세요", done: false },
+                  { title: "반환 기한 대기", desc: "발송 후 14일간 대기", done: false },
+                ].map((s, i, arr) => (
+                  <div key={i} style={{ display: "flex", gap: 16 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: 12,
+                        background: s.done ? C.b500 : C.w,
+                        border: s.done ? "none" : `2px solid ${C.g300}`,
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        {s.done && <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                      </div>
+                      {i < arr.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 28, background: s.done ? C.b500 : C.g200, marginTop: 4, marginBottom: 4, borderRadius: 1, opacity: s.done ? 0.4 : 1 }} />}
+                    </div>
+                    <div style={{ flex: 1, paddingBottom: i < arr.length - 1 ? 24 : 0 }}>
+                      <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>{s.title}</div>
+                      <div style={{ ...T.t7(400), color: s.done ? C.g400 : C.g500 }}>{s.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.docGrey} title="반환 요청서 보기" desc="작성한 요청서를 다시 확인해요" target="b21_preview" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <PartnerSection phaseKey="분쟁 중" />
+            </>
+          )}
+
+          {/* 내용증명 발송 완료 */}
+          {phase === "내용증명 발송 완료" && (
+            <>
+              <div style={{ padding: "24px 24px 16px" }}>
+                <div style={{ ...T.t6(500), color: C.g600 }}>분쟁 대응 현황</div>
+              </div>
+              <div style={{ padding: "4px 24px 20px" }}>
+                {[
+                  { title: "퇴거 의사 통보", desc: "2027.02.01 발송", done: true },
+                  { title: "집주인 연락 확인", desc: "연락 불가 확인", done: true },
+                  { title: "반환 요청서 작성", desc: "작성 완료", done: true },
+                  { title: "내용증명 발송", desc: "2027.04.10 인터넷우체국 발송", done: true },
+                  { title: "반환 기한 대기", desc: "14일 이내 (04.24까지)", done: false },
+                ].map((s, i, arr) => (
+                  <div key={i} style={{ display: "flex", gap: 16 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24 }}>
+                      <div style={{
+                        width: 24, height: 24, borderRadius: 12,
+                        background: s.done ? C.b500 : C.w,
+                        border: s.done ? "none" : `2px solid ${C.g300}`,
+                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                      }}>
+                        {s.done && <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7l3 3 5-6" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                      </div>
+                      {i < arr.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 28, background: s.done ? C.b500 : C.g200, marginTop: 4, marginBottom: 4, borderRadius: 1, opacity: s.done ? 0.4 : 1 }} />}
+                    </div>
+                    <div style={{ flex: 1, paddingBottom: i < arr.length - 1 ? 24 : 0 }}>
+                      <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>{s.title}</div>
+                      <div style={{ ...T.t7(400), color: s.done ? C.g400 : C.g500 }}>{s.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.docGrey} title="내용증명 보기" desc="발송한 반환 요청서를 다시 확인해요" target="b21_preview" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <PartnerSection phaseKey="분쟁 중" />
+            </>
+          )}
+
+          {/* 계약 마무리 */}
+          {phase === "계약 마무리" && (
+            <>
+              <div style={{ padding: "20px 24px 8px" }}><span style={{ ...T.t6(500), color: C.g600 }}>내 계약 관리</span></div>
+              <ACard icon={ICONS.doc} title="계약서 보기" desc="보증금, 월세, 특약, 만기일을 확인해요" />
+              <ACard icon={ICONS.cam} title="입주 기록 보기" desc="촬영한 사진과 전송 이력을 확인해요" />
+              <div style={{ padding: "32px 24px 0", display: "flex", justifyContent: "center" }}>
+                <button onClick={() => go("home_pre")} style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 0", ...T.t6(500), color: C.g600, textDecoration: "underline", textUnderlineOffset: 3 }}>새 계약 등록하기</button>
+              </div>
+            </>
+          )}
+
+        </>
+      )}
+
+      {/* 탭바 영역 여백 (모든 phase 공통) */}
+      <div style={{ height: 120, flexShrink: 0 }} />
+
+      {/* Bottom gradient fade */}
+      <div style={{
+        position: "absolute", bottom: 0, left: 0, right: 0, height: 120,
+        background: "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 50%, rgba(255,255,255,1) 100%)",
+        pointerEvents: "none",
+      }} />
+      {/* Tab Bar — Floating Pill */}
+      <div style={{
+        position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)",
+        height: 56, borderRadius: 28, padding: "0 10px",
+        background: "rgba(255,255,255,0.82)",
+        backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.05)",
+        display: "flex", alignItems: "center", gap: 4,
+      }}>
+        {[
+          { active: false, icon: (c) => <><rect x="3" y="3" width="18" height="18" rx="3" stroke={c} strokeWidth="1.8" /><path d="M3 10h18M8 3v7M16 3v7M7 14h4M7 17.5h6" stroke={c} strokeWidth="1.8" strokeLinecap="round" /></> },
+          { active: true, icon: (c) => <><path d="M3 9.5L12 3l9 6.5V20a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 20V9.5z" fill={c} stroke={c} strokeWidth="1.8" strokeLinejoin="round" /><path d="M9 21.5V14h6v7.5" stroke={C.w} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></> },
+          { active: false, icon: (c) => <><circle cx="12" cy="9" r="4" stroke={c} strokeWidth="1.8" /><path d="M4 20c0-3.314 3.582-6 8-6s8 2.686 8 6" stroke={c} strokeWidth="1.8" strokeLinecap="round" /></> },
+        ].map((tab, i) => (
+          <div key={i} style={{
+            width: 52, height: 44, borderRadius: 22,
+            display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+            background: tab.active ? "rgba(49,130,246,0.1)" : "none",
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              {tab.icon(tab.active ? C.b500 : C.g400)}
+            </svg>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// AGENT REC — 인근 공인중개사 추천
+// ═══════════════════════════════════════════════════════
+function AgentRec({ go, fromChecked }) {
+  const agents = [
+    { name: "마포 행복 공인중개사", area: "마포구 연남동", rating: "4.8", reviews: 127, tags: ["월세 전문", "즉시 입주 가능"] },
+    { name: "신촌 스마트 공인중개사", area: "서대문구 창천동", rating: "4.6", reviews: 89, tags: ["1인가구 전문", "야간 상담"] },
+    { name: "홍대 믿음 부동산", area: "마포구 서교동", rating: "4.5", reviews: 64, tags: ["보증보험 안내", "신축 매물"] },
+  ];
+  return (
+    <>
+      <SBar />
+      <Nav title="공인중개사 추천" onBack={() => go(fromChecked ? "home_checked" : "home_pre")} />
+      <PH
+        title={fromChecked ? "더 좋은 집을" : "인근 공인중개사를"}
+        accent={fromChecked ? "찾아볼까요?" : "찾아보세요"}
+        desc={fromChecked ? "인근 공인중개사를 통해 조건에 맞는 새로운 매물을 찾아보세요." : "내 주변의 공인중개사를 확인하고 상담을 요청할 수 있어요."}
+      />
+      <div style={{ padding: "24px 24px 8px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ ...T.t6(500), color: C.g600 }}>{contract.address.split(" ").slice(0, 2).join(" ")} 인근</span>
+        <span style={{ ...T.s13(400), color: C.g400 }}>제휴</span>
+      </div>
+      <div style={{ padding: "0 24px" }}>
+        {agents.map((a, i) => (
+          <div key={i} style={{ background: C.g50, borderRadius: 16, padding: 20, marginBottom: 10, cursor: "pointer" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+              <div>
+                <div style={{ ...T.t6(600), color: C.g900, marginBottom: 2 }}>{a.name}</div>
+                <div style={{ ...T.t7(400), color: C.g500 }}>{a.area}</div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.76 3.57L12.7 5.2l-2.85 2.78.67 3.93L7 10.17 3.48 11.9l.67-3.93L1.3 5.2l3.94-.63L7 1z" fill="#ffc342" /></svg>
+                <span style={{ ...T.t7(600), color: C.g800 }}>{a.rating}</span>
+                <span style={{ ...T.t7(400), color: C.g400 }}>({a.reviews})</span>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {a.tags.map((t, j) => (
+                <span key={j} style={{ ...T.s13(400), color: C.b600, background: C.b50, padding: "3px 8px", borderRadius: 6 }}>{t}</span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ padding: "12px 24px" }}>
+        <div style={{ ...T.s13(400), color: C.g400, textAlign: "center" }}>제휴 중개사의 매물 정보를 제공합니다</div>
+      </div>
+      <div style={{ flex: 1 }} />
+      <BCTA label="홈으로 돌아가기" onClick={() => go("home_pre")} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// A0 — 계약서 OCR 검토
+// ═══════════════════════════════════════════════════════
+function A0Capture({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="계약서 등록" onBack={() => go("home_pre")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="계약서를 촬영하면" accent="위험 요소를 찾아드려요" desc={"계약서 사진을 찍으면 핵심 조건을\n자동으로 추출해드려요."} />
+        <div style={{ padding: "32px 24px 0" }}>
+        <div onClick={() => go("a0_extracted")} style={{
+          width: "100%", aspectRatio: "3/4", borderRadius: 20,
+          border: `2px dashed ${C.g300}`, background: C.g50,
+          display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", gap: 16, cursor: "pointer",
+        }}>
+          <div style={{ width: 72, height: 72, borderRadius: 36, background: C.b50, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="12" cy="13" r="4" stroke={C.b500} strokeWidth="2" />
+            </svg>
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ ...T.t6(500), color: C.g700, marginBottom: 4 }}>계약서 전체가 보이게 촬영해주세요</div>
+          </div>
+        </div>
+
+      </div>
+      </div>
+      <BCTA label="촬영하기" onClick={() => go("a0_extracted")} />
+    </>
+  );
+}
+
+function A0Extracted({ go }) {
+  const fieldIcons = {
+    won: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke={C.b500} strokeWidth="1.8"/><path d="M7 9l2.5 7L12 10l2.5 6L17 9" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+    cal: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke={C.b500} strokeWidth="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round"/></svg>,
+    period: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke={C.b500} strokeWidth="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round"/><path d="M8 15h8" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round"/></svg>,
+    pin: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke={C.b500} strokeWidth="1.8"/><circle cx="12" cy="10" r="3" stroke={C.b500} strokeWidth="1.8"/></svg>,
+    person: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke={C.b500} strokeWidth="1.8"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  };
+  const fields = [
+    { label: "보증금", value: contract.deposit, icon: fieldIcons.won },
+    { label: "월세", value: contract.rent, icon: fieldIcons.cal },
+    { label: "계약 기간", value: contract.period, icon: fieldIcons.period },
+    { label: "임대 주소", value: contract.address, icon: fieldIcons.pin },
+    { label: "집주인", value: contract.landlord, icon: fieldIcons.person },
+  ];
+  return (
+    <>
+      <SBar />
+      <Nav title="계약서 확인" onBack={() => go("a0_capture")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 120 }}>
+        <PH title="이 내용이 맞나요?" desc={"계약서에서 5개 항목을 자동으로 추출했어요.\n틀린 부분이 있으면 수정해주세요."} />
+        <div style={{ padding: "20px 24px 0" }}>
+          {fields.map((f, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 0", borderBottom: i < fields.length - 1 ? `1px solid ${C.g100}` : "none", cursor: "pointer" }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: C.g50, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{f.icon}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ ...T.s13(400), color: C.g400, marginBottom: 2 }}>{f.label}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ ...T.t6(500), color: C.g900 }}>{f.value}</span>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}><path d="M8.5 2.5l3 3M2 9l5.5-5.5 3 3L5 12H2V9z" stroke={C.g400} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <BCTA label="맞아요, 다음으로" onClick={() => go("a0_review")} />
+    </>
+  );
+}
+
+function A0Review({ go, from }) {
+  const issues = [
+    { s: "warning", t: "원상복구 특약", d: "퇴거 시 원상복구 비용이 세입자 부담으로 되어 있어요. 범위를 구체적으로 정하는 게 좋아요.", action: "수정 요청 문구 보기" },
+    { s: "missing", t: "수리 범위 특약 없음", d: "소모품과 시설 수리 비용 부담 주체가 정해져 있지 않아요.", action: "추천 특약 보기" },
+    { s: "missing", t: "보증금 반환 기한 없음", d: "보증금 반환 기한이 없어요. 명시해두면 분쟁을 줄일 수 있어요.", action: "추천 특약 보기" },
+  ];
+  const safeItems = [
+    { t: "계약 기간 2년 확인", d: "주택임대차보호법 최소 기간을 충족해요." },
+    { t: "보증금 · 월세 기재 확인", d: "소액임차인 보호 대상 범위 내예요." },
+  ];
+  const STM = { warning: { c: C.o600, bg: C.o50, l: "주의" }, missing: { c: C.r500, bg: C.r50, l: "누락" } };
+
+  return (
+    <>
+      <SBar />
+      <Nav title="계약서 검토" onBack={() => go(from === "home_checked" ? "home_checked" : "a0_extracted")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 120 }}>
+        <PH title={`${issues.length}개 확인이 필요해요`} desc={`주의 ${issues.filter(i=>i.s==="warning").length}개 · 누락 ${issues.filter(i=>i.s==="missing").length}개 · 정상 ${safeItems.length}개`} />
+        {/* 문제 항목 */}
+        <div style={{ padding: "20px 24px 0" }}>
+          {issues.map((item, i) => {
+            const cfg = STM[item.s];
+            return (
+              <div key={i} style={{ background: C.w, borderRadius: 16, border: `1px solid ${C.g200}`, padding: "20px", marginBottom: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <span style={{ ...T.t5(600), color: C.g900 }}>{item.t}</span>
+                  <span style={{ ...T.s13(600), padding: "2px 8px", borderRadius: 8, background: cfg.bg, color: cfg.c }}>{cfg.l}</span>
+                </div>
+                <div style={{ ...T.t7(400), color: C.g600, lineHeight: "20px", wordBreak: "keep-all", textWrap: "balance" }}>{item.d}</div>
+                {item.action && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 12, cursor: "pointer" }}>
+                    <span style={{ ...T.t7(500), color: C.b500 }}>{item.action}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {/* 정상 항목 — 축소 표시 */}
+        <div style={{ padding: "8px 24px 0" }}>
+          <div style={{ ...T.s13(500), color: C.g400, marginBottom: 8 }}>정상 항목</div>
+          {safeItems.map((item, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 0", borderBottom: i < safeItems.length - 1 ? `1px solid ${C.g100}` : "none" }}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}><circle cx="8" cy="8" r="7" stroke={C.gn500} strokeWidth="1.2" /><path d="M5.5 8.5l2 2 3.5-4" stroke={C.gn500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              <span style={{ ...T.t7(400), color: C.g500 }}>{item.t}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <BCTA label={from === "home_checked" ? "확인" : "등록 완료"} onClick={() => go("home_checked")} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// A2 — 리스크 진단 리포트
+// ═══════════════════════════════════════════════════════
+const diagItems = [
+  { id: "mr", status: "warning", title: "근저당 대비 보증금", desc: "선순위 근저당이 집값의 60%예요. 보증금 회수에 영향을 줄 수 있어요.", action: "자세히 보기" },
+  { id: "st", status: "safe", title: "소액임차인 보호", desc: "보증금 1,000만원은 최우선변제 대상이에요.", action: null },
+  { id: "ins", status: "info", title: "보증보험", desc: "필수는 아니지만, 추가 보호를 원하면 가입할 수 있어요.", action: "가입 조건 확인" },
+];
+const ST = { danger: { c: C.r500, bg: C.r50, l: "위험" }, warning: { c: C.o500, bg: C.o50, l: "주의" }, safe: { c: C.gn500, bg: C.gn50, l: "정상" }, info: { c: C.b500, bg: C.b50, l: "선택" } };
+
+function A2Screen({ go, completeStep = () => {} }) {
+  const [showSafe, setShowSafe] = useState(false);
+  const warnings = diagItems.filter(i => i.status === "warning");
+  const safes = diagItems.filter(i => i.status === "safe" || i.status === "info");
+  return (
+    <>
+      <SBar />
+      <Nav title="리스크 진단" onBack={() => go("home_post")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 120 }}>
+        <PH title="내 보증금 보호 상태" desc={`주의 ${warnings.length}개 · 정상 ${safes.length}개`} />
+        {/* 주의 항목 */}
+        {warnings.length > 0 && (
+          <div style={{ padding: "20px 24px 0" }}>
+            {warnings.map((item, i) => {
+              const cfg = ST[item.status];
+              return (
+                <div key={item.id} style={{ background: C.w, borderRadius: 16, border: `1px solid ${C.g200}`, padding: 20, marginBottom: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ ...T.s13(600), padding: "2px 8px", borderRadius: 8, background: cfg.bg, color: cfg.c }}>{cfg.l}</span>
+                    <span style={{ ...T.t5(600), color: C.g900 }}>{item.title}</span>
+                  </div>
+                  <div style={{ ...T.t7(400), color: C.g600, lineHeight: "20px", wordBreak: "keep-all", textWrap: "balance" }}>{item.desc}</div>
+                  {item.action && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 12, cursor: "pointer" }}>
+                      <span style={{ ...T.t7(500), color: C.b500 }}>{item.action}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {/* 정상 · 선택 — 폴딩 */}
+        {safes.length > 0 && (
+          <div style={{ padding: "8px 24px 0" }}>
+            <div onClick={() => setShowSafe(!showSafe)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", cursor: "pointer" }}>
+              <span style={{ ...T.t6(500), color: C.g500 }}>정상 항목 {safes.length}개</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ transform: showSafe ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                <path d="M6 9l6 6 6-6" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            {showSafe && safes.map((item, i) => {
+              const cfg = ST[item.status];
+              return (
+                <div key={item.id} style={{ background: C.w, borderRadius: 16, border: `1px solid ${C.g200}`, padding: 20, marginBottom: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                    <span style={{ ...T.s13(600), padding: "2px 8px", borderRadius: 8, background: C.gn50, color: C.gn500 }}>{item.status === "info" ? "선택" : cfg.l}</span>
+                    <span style={{ ...T.t5(600), color: C.g900 }}>{item.title}</span>
+                  </div>
+                  <div style={{ ...T.t7(400), color: C.g600, lineHeight: "20px", wordBreak: "keep-all", textWrap: "balance" }}>{item.desc}</div>
+                  {item.action && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 12, cursor: "pointer" }}>
+                      <span style={{ ...T.t7(500), color: C.b500 }}>{item.action}</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <BCTA label="확인" onClick={() => { completeStep("a2"); go("home_post"); }} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// A3 — 전입신고 + 확정일자 안내
+// ═══════════════════════════════════════════════════════
+// TDS 정합: ListRow 패턴, One Thing per One Page, Value First
+function A3Screen({ go, completeStep = () => {} }) {
+  // TDS ListRow 패턴 — left(icon) + contents(texts) + right(arrow optional)
+  const LR = ({ icon, title, desc, arrow, onClick, vPad = 16 }) => (
+    <div
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: desc ? "flex-start" : "center", gap: 12,
+        padding: `${vPad}px 24px`,
+        cursor: onClick ? "pointer" : "default",
+      }}
+    >
+      {icon && (
+        <div style={{ width: 36, height: 36, borderRadius: 18, background: C.b50, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          {icon}
+        </div>
+      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ ...T.t6(600), color: C.g900, display: "block" }}>{title}</span>
+        {desc && <span style={{ ...T.t7(400), color: C.g600, lineHeight: "20px", display: "block", marginTop: 2, wordBreak: "keep-all", whiteSpace: "pre-line", textWrap: "balance" }}>{desc}</span>}
+      </div>
+      {arrow && (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: 2 }}>
+          <path d="M9 18l6-6-6-6" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </div>
+  );
+
+  // TDS ListHeader 패턴
+  // TDS Section Spacing: paddingTop 32px = 섹션 간 표준 여백
+  const LH = ({ title, sub }) => (
+    <div style={{ padding: "24px 24px 0" }}>
+      <span style={{ ...T.t5(600), color: C.g900, display: "block" }}>{title}</span>
+      {sub && <span style={{ ...T.t7(400), color: C.g500, display: "block", marginTop: 2 }}>{sub}</span>}
+    </div>
+  );
+
+  return (
+    <>
+      <SBar />
+      <Nav title="전입신고 + 확정일자" onBack={() => go("home_post")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 120 }}>
+        <PH title="잔금일 당일에" accent="전입신고하세요" />
+
+        {/* 긴급성 노티스 — 인라인 텍스트 */}
+        <div style={{ padding: "12px 24px 0", display: "flex", alignItems: "center", gap: 6 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10" stroke={C.b500} strokeWidth="2"/><path d="M12 8v4l3 3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <span style={{ ...T.t7(400), color: C.g600, wordBreak: "keep-all" }}>늦추면 그 기간만큼 법적 보호가 없어요</span>
+        </div>
+
+        {/* 할 일 2가지 — TDS ListRow 패턴 */}
+        <LH title="주민센터에서 할 일" />
+        <LR
+          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9.5L12 3l9 6.5V20a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 20V9.5z" stroke={C.b500} strokeWidth="1.8" strokeLinejoin="round"/><path d="M9 21.5V14h6v7.5" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          title="전입신고"
+          desc={"새 주소로 거주지 이전 신고예요.\n보증금을 돌려받을 수 있는 권리가 시작돼요."}
+        />
+        <div style={{ height: 1, background: C.g100, margin: "0 24px" }} />
+        <LR
+          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          title="확정일자"
+          desc={"계약서에 날짜 도장을 받는 절차예요.\n다른 채권자보다 먼저 보증금을 받을 수 있어요."}
+        />
+
+        {/* 준비물 — TDS ListRow compact */}
+        <LH title="준비물" />
+        {[
+          { item: "신분증", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke={C.g600} strokeWidth="1.8"/><circle cx="9" cy="12" r="2" stroke={C.g600} strokeWidth="1.5"/><path d="M15 10h2M15 14h2" stroke={C.g600} strokeWidth="1.5" strokeLinecap="round"/></svg> },
+          { item: "임대차 계약서 원본", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+        ].map((row, i) => (
+          <div key={i}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 24px" }}>
+              <div style={{ width: 32, height: 32, borderRadius: 16, background: C.g50, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{row.icon}</div>
+              <span style={{ ...T.t6(400), color: C.g800 }}>{row.item}</span>
+            </div>
+            {i < 1 && <div style={{ height: 1, background: C.g100, margin: "0 24px" }} />}
+          </div>
+        ))}
+
+        {/* 주민센터 찾기 — TDS ListRow withArrow */}
+        <LH title="가까운 주민센터" sub={`${contract.address} 기준`} />
+        <LR
+          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="10" r="3" stroke={C.b500} strokeWidth="1.8"/></svg>}
+          title="주민센터 위치 확인하기"
+          arrow
+          onClick={() => {}}
+        />
+
+        {/* BottomInfo — 유의사항 (TDS BottomInfo 패턴) */}
+        <div style={{ padding: "16px 24px 24px", marginTop: 8 }}>
+          <div style={{ ...T.s13(400), color: C.g400, lineHeight: "18px" }}>
+            · 잔금일 당일에 전입신고와 확정일자를 함께 처리하세요
+            <br />
+            · 전입신고는 정부24에서도 가능해요
+            <br />
+            · 확정일자는 주민센터 방문이 필요해요
+          </div>
+        </div>
+      </div>
+      <BCTA label="전입신고 완료했어요" onClick={() => { completeStep("movein"); go("home_post"); }} />
+    </>
+  );
+}
+
+
+// ═══════════════════════════════════════════════════════
+// A4 — 입주 증거 기록 (원본 플로우 복원)
+// ═══════════════════════════════════════════════════════
+const guidedSteps = [
+  { label: "현관", desc: "신발장, 도어락, 바닥 포함" },
+  { label: "방", desc: "벽면, 바닥, 창문, 천장 포함" },
+  { label: "주방", desc: "싱크대, 가스레인지 포함" },
+  { label: "욕실", desc: "세면대, 변기, 타일 포함" },
+  { label: "기타", desc: "보일러, 분전함, 계량기 등" },
+];
+let _pid = 0;
+
+function CloseX({ onClick }) {
+  return (
+    <button onClick={onClick} style={{ width: 32, height: 32, borderRadius: 16, background: "rgba(255,255,255,0.12)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round"/></svg>
+    </button>
+  );
+}
+
+function CamBar({ count, onShoot, rightAction, onThumb }) {
+  return (
+    <div style={{ padding: "16px 24px 40px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <button onClick={count > 0 ? onThumb : undefined} style={{ width: 48, height: 48, borderRadius: 12, background: count > 0 ? "rgba(255,255,255,0.15)" : "transparent", border: count > 0 ? "2px solid rgba(255,255,255,0.3)" : "none", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", cursor: count > 0 ? "pointer" : "default", padding: 0 }}>
+        {count > 0 && (
+          <>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="13" r="4" stroke="rgba(255,255,255,0.5)" strokeWidth="2"/></svg>
+            <div style={{ position: "absolute", top: -6, right: -6, minWidth: 20, height: 20, borderRadius: 10, padding: "0 5px", background: C.b500, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 11, color: C.w, fontWeight: 700 }}>{count}</span>
+            </div>
+          </>
+        )}
+      </button>
+      <button onClick={onShoot} style={{ width: 72, height: 72, borderRadius: 36, border: "4px solid rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.3)", cursor: "pointer" }} />
+      {rightAction || <div style={{ width: 48, height: 48 }} />}
+    </div>
+  );
+}
+
+function PreviewSheet({ label, onRetake, onClose }) {
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, zIndex: 10, background: "rgba(0,0,0,0.5)" }} />
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 11, background: C.w, borderRadius: "24px 24px 0 0", padding: "20px 24px 40px" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}><div style={{ width: 36, height: 4, borderRadius: 2, background: C.g200 }} /></div>
+        <div style={{ width: "100%", aspectRatio: "4/3", borderRadius: 16, background: C.g100, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+          <div style={{ textAlign: "center" }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" style={{ display: "block", marginBottom: 8 }}><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke={C.g400} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="13" r="4" stroke={C.g400} strokeWidth="1.5"/></svg>
+            <span style={{ ...T.t6(500), color: C.g500 }}>{label}</span>
+          </div>
+        </div>
+        <button onClick={onRetake} style={{ width: "100%", height: 54, borderRadius: 16, border: `1.5px solid ${C.g200}`, background: C.w, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, ...T.t5(500), color: C.g800 }}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4.5 8.5L2 6l2.5-2.5" stroke={C.g700} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 6h11a5 5 0 010 10H7" stroke={C.g700} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          다시 찍기
+        </button>
+        <div style={{ textAlign: "center", marginTop: 12 }}><button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", ...T.t7(400), color: C.g400, padding: 8 }}>닫기</button></div>
+      </div>
+    </>
+  );
+}
+
+function A4_1Screen({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="입주 상태 기록" onBack={() => go("home_post")} />
+      <div className="no-scrollbar" style={{ flex: 1, display: "flex", flexDirection: "column", overflowY: "auto" }}>
+        <PH title="이런 곳을" accent="촬영해주세요" />
+        <div style={{ padding: "32px 24px 0", flex: 1 }}>
+          {[{ icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke={C.b500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="13" r="4" stroke={C.b500} strokeWidth="1.8"/></svg>, title: "각 방을 넓게 한 장씩", desc: "어디를 찍을지는 촬영 중에 안내해 드려요", bg: C.b50 },
+            { icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke={C.r500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 9v4M12 17h.01" stroke={C.r500} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>, title: "파손된 곳은 가까이", desc: "안 찍으면 퇴거 시 내 책임이 될 수 있어요", bg: C.r50 }
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 28 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 16, background: item.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{item.icon}</div>
+              <div>
+                <span style={{ ...T.t5(500), color: C.g900, display: "block", marginBottom: 2 }}>{item.title}</span>
+                <span style={{ ...T.t7(400), color: C.g500 }}>{item.desc}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <BCTA label="촬영 시작" onClick={() => go("a4_guide")} />
+    </>
+  );
+}
+
+function A4GuideScreen({ go }) {
+  const [step, setStep] = useState(0);
+  const [photos, setPhotos] = useState([]);
+  const [showPv, setShowPv] = useState(false);
+  const shoot = () => {
+    setPhotos(p => [...p, { id: ++_pid, type: "guided", label: guidedSteps[step].label }]);
+    if (step < 4) setStep(s => s + 1); else go("a4_free");
+  };
+  const retake = () => { setPhotos(p => p.slice(0, -1)); setStep(s => Math.max(0, s - 1)); setShowPv(false); };
+  const exit = () => go(photos.length > 0 ? "a4_confirm" : "a4_1");
+  return (
+    <div style={{ background: C.g900, flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
+      <div style={{ height: 54 }} />
+      <div style={{ padding: "0 16px 20px" }}><CloseX onClick={exit} /></div>
+      <div style={{ padding: "0 24px" }}>
+        <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+          {guidedSteps.map((_, i) => (
+            <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i < photos.length ? C.b500 : i === step ? "rgba(49,130,246,0.4)" : "rgba(255,255,255,0.12)" }} />
+          ))}
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <span style={{ ...T.t7(400), color: "rgba(255,255,255,0.4)" }}>{step + 1} / 5</span>
+        </div>
+      </div>
+      <div onClick={shoot} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <div style={{ width: 320, height: 280, border: "2px solid rgba(255,255,255,0.2)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+          <span style={{ ...T.t6(400), color: "rgba(255,255,255,0.3)" }}>탭해서 촬영</span>
+        </div>
+        <div style={{ padding: "12px 24px", background: "rgba(49,130,246,0.25)", borderRadius: 20, textAlign: "center" }}>
+          <span style={{ ...T.t5(500), color: C.w, display: "block" }}>{guidedSteps[step].label}</span>
+          <span style={{ ...T.t7(400), color: "rgba(255,255,255,0.6)", marginTop: 2, display: "block" }}>{guidedSteps[step].desc}</span>
+        </div>
+      </div>
+      <CamBar count={photos.length} onShoot={shoot} onThumb={() => setShowPv(true)} />
+      {showPv && photos.length > 0 && <PreviewSheet label={`${photos[photos.length-1].label} 사진`} onRetake={retake} onClose={() => setShowPv(false)} />}
+    </div>
+  );
+}
+
+function A4FreeScreen({ go }) {
+  const [count, setCount] = useState(0);
+  const [showPv, setShowPv] = useState(false);
+  const total = 5 + count;
+  const shoot = () => setCount(c => c + 1);
+  const retake = () => { if (count > 0) setCount(c => c - 1); setShowPv(false); };
+  const exit = () => go("a4_confirm");
+  return (
+    <div style={{ background: C.g900, flex: 1, display: "flex", flexDirection: "column", position: "relative" }}>
+      <div style={{ height: 54 }} />
+      <div style={{ padding: "0 16px 8px" }}><CloseX onClick={exit} /></div>
+      <div style={{ padding: "4px 24px 16px", display: "flex", justifyContent: "center" }}>
+        <span style={{ ...T.s13(500), color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.08)", padding: "4px 12px", borderRadius: 12 }}>✓ 기본 촬영 완료</span>
+      </div>
+      <div onClick={shoot} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <div style={{ width: 320, height: 280, border: "2px solid rgba(240,68,82,0.3)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+          <span style={{ ...T.t6(400), color: "rgba(255,255,255,0.3)" }}>탭해서 촬영</span>
+        </div>
+        <div style={{ padding: "12px 24px", background: "rgba(240,68,82,0.2)", borderRadius: 20, textAlign: "center", maxWidth: 320 }}>
+          <span style={{ ...T.t5(500), color: C.w, display: "block" }}>파손·하자가 있다면 찍어주세요</span>
+          <span style={{ ...T.t7(400), color: "rgba(255,255,255,0.5)", marginTop: 2, display: "block" }}>발견한 곳마다 가까이, 원하는 만큼</span>
+        </div>
+      </div>
+      <CamBar count={total} onShoot={shoot} onThumb={() => setShowPv(true)} rightAction={
+        <button onClick={exit} style={{ width: 48, height: 48, borderRadius: 24, border: "none", background: C.b500, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke={C.w} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
+      } />
+      {showPv && <PreviewSheet label={count > 0 ? `하자 사진 ${count}` : "마지막 사진"} onRetake={retake} onClose={() => setShowPv(false)} />}
+    </div>
+  );
+}
+
+function A4ConfirmScreen({ go }) {
+  const [editMode, setEditMode] = useState(false);
+  const [photos, setPhotos] = useState([
+    ...guidedSteps.map((s, i) => ({ id: i+1, type: "guided", label: s.label })),
+    { id: 6, type: "free", label: "하자" }, { id: 7, type: "free", label: "하자" },
+  ]);
+  const del = (id) => setPhotos(p => p.filter(x => x.id !== id));
+  return (
+    <>
+      <SBar />
+      <Nav title="입주 상태 기록" onBack={() => go("a4_1")} />
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 120 }}>
+        <PH title="촬영한 사진을" accent="확인해주세요" />
+        <div style={{ padding: "20px 24px 0 24px", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ ...T.t7(500), color: C.g600 }}>사진 {photos.length}장</span>
+          <button onClick={() => setEditMode(!editMode)} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, ...T.t7(400), color: editMode ? C.b500 : C.g400 }}>{editMode ? "완료" : "편집"}</button>
+        </div>
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+            {photos.map((p, i) => (
+              <div key={p.id} style={{ position: "relative", aspectRatio: "1" }}>
+                <div style={{ width: "100%", height: "100%", borderRadius: 12, background: p.type === "guided" ? C.b50 : C.g100, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, border: editMode ? `1.5px solid ${C.g200}` : "none" }}>
+                  <span style={{ ...T.t7(400), color: p.type === "guided" ? C.b500 : C.g500 }}>{p.label}</span>
+                  <span style={{ ...T.s13(400), color: C.g300 }}>{i + 1}</span>
+                </div>
+                {editMode && (
+                  <button onClick={() => del(p.id)} style={{ position: "absolute", top: -6, right: -6, width: 22, height: 22, borderRadius: 11, background: C.g700, border: `2px solid ${C.w}`, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }}>
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke={C.w} strokeWidth="1.8" strokeLinecap="round"/></svg>
+                  </button>
+                )}
+              </div>
+            ))}
+            {!editMode && (
+              <button onClick={() => go("a4_free")} style={{ aspectRatio: "1", borderRadius: 12, border: `1.5px dashed ${C.g300}`, background: C.g50, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, cursor: "pointer" }}>
+                <span style={{ fontSize: 24, color: C.g400 }}>+</span>
+                <span style={{ ...T.s13(400), color: C.g400 }}>더 찍기</span>
+              </button>
+            )}
+          </div>
+        </div>
+        <div style={{ padding: "16px 24px 0" }}>
+          <div style={{ padding: "12px 16px", background: C.g50, borderRadius: 12, display: "flex", alignItems: "center", gap: 8 }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke={C.g400} strokeWidth="1.2"/><path d="M5.5 8.5l2 2 3.5-4" stroke={C.gn500} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span style={{ ...T.t7(400), color: C.g500 }}>날짜·위치·시간이 자동으로 기록됐어요</span>
+          </div>
+        </div>
+      </div>
+      <BCTA label="다음" onClick={() => go("a4_2")} />
+    </>
+  );
+}
+
+function A4_2Screen({ go, completeStep = () => {} }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="입주 상태 기록" onBack={() => go("a4_confirm")} />
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
+        <PH title="집주인에게 문자로 보내야" accent="보증금 반환 증거가 돼요" />
+        <Dv />
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ border: `1px solid ${C.g200}`, borderRadius: 16, overflow: "hidden" }}>
+            <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 18, background: C.g100, display: "flex", alignItems: "center", justifyContent: "center" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke={C.g400} strokeWidth="2"/><path d="M4 21v-1a6 6 0 0112 0v1" stroke={C.g400} strokeWidth="2" strokeLinecap="round"/></svg></div>
+              <div style={{ flex: 1 }}>
+                <span style={{ ...T.t6(500), color: C.g900, display: "block" }}>집주인</span>
+                <span style={{ ...T.t7(400), color: C.g400 }}>010-****-5678</span>
+              </div>
+              <span style={{ ...T.t7(400), color: C.g400 }}>문자</span>
+            </div>
+            <div style={{ height: 1, background: C.g100 }} />
+            <div style={{ padding: "16px 20px 12px" }}>
+              <span style={{ ...T.t6(400), color: C.g800, display: "block", lineHeight: "23px" }}>입주일(2026.04.01) 기준 집 상태를 사진으로 기록했습니다. 확인 부탁드립니다.</span>
+            </div>
+            <div style={{ padding: "0 20px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6 }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ aspectRatio: "1", borderRadius: 10, background: C.g100, display: "flex", alignItems: "center", justifyContent: "center", ...T.s13(400), color: C.g400 }}>{i}</div>
+              ))}
+              <div style={{ aspectRatio: "1", borderRadius: 10, background: C.g100, display: "flex", alignItems: "center", justifyContent: "center", ...T.t7(400), color: C.g500 }}>+3</div>
+            </div>
+            <div style={{ padding: "12px 20px 16px", display: "flex", justifyContent: "flex-end" }}>
+              <span style={{ ...T.t7(400), color: C.g400, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}>내용 수정</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <BCTA label="문자 앱으로 이동" onClick={() => go("a4_sent")} sub="나중에 보내기" onSub={() => go("home_post")} icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} />
+    </>
+  );
+}
+
+function A4SentScreen({ go, completeStep = () => {} }) {
+  const [phase, setPhase] = useState("sending");
+  useEffect(() => {
+    const t = setTimeout(() => setPhase("done"), 2200);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <>
+      <SBar />
+      <Nav title="" onBack={null} />
+      <style>{`
+        @keyframes envelopeEnter {
+          0% { transform: scale(0.3) translateY(30px); opacity: 0; }
+          50% { transform: scale(1.08) translateY(-5px); opacity: 1; }
+          70% { transform: scale(0.96) translateY(2px); }
+          100% { transform: scale(1) translateY(0); }
+        }
+        @keyframes envelopePulse {
+          0%,100% { transform: scale(1); }
+          50% { transform: scale(0.94); }
+        }
+        @keyframes checkPop {
+          0% { transform: scale(0); opacity: 0; }
+          60% { transform: scale(1.25); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+        @keyframes textFadeUp {
+          0% { transform: translateY(12px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes dotPulse {
+          0%,100% { opacity:0.3; transform:scale(0.8); }
+          50% { opacity:1; transform:scale(1.2); }
+        }
+      `}</style>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+        {/* Envelope */}
+        <div style={{
+          position: "relative", width: 140, height: 140, marginBottom: 36,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          animation: phase === "sending"
+            ? "envelopeEnter 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards, envelopePulse 1.6s ease-in-out 0.8s infinite"
+            : "envelopeEnter 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
+        }}>
+          <svg width="120" height="90" viewBox="0 0 120 90" fill="none">
+            <defs>
+              <linearGradient id="envBody" x1="60" y1="0" x2="60" y2="90" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="#d4eaff"/>
+                <stop offset="1" stopColor="#b8dafc"/>
+              </linearGradient>
+              <linearGradient id="envFlap" x1="60" y1="0" x2="60" y2="50" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="#bfe0ff"/>
+                <stop offset="1" stopColor="#9ccbf9"/>
+              </linearGradient>
+              <filter id="envShadow" x="-4" y="2" width="128" height="96" filterUnits="userSpaceOnUse">
+                <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#6ba8e6" floodOpacity="0.18"/>
+              </filter>
+            </defs>
+            {/* Shadow */}
+            <rect x="2" y="2" width="116" height="86" rx="14" fill="transparent" filter="url(#envShadow)"/>
+            {/* Body — single gradient */}
+            <rect x="2" y="2" width="116" height="86" rx="14" fill="url(#envBody)"/>
+            {/* Flap — slightly darker than body */}
+            <path d="M2 14C2 7.4 7.4 2 14 2h92c6.6 0 12 5.4 12 12L66 50c-3.2 2.2-8.8 2.2-12 0L2 14z" fill="url(#envFlap)"/>
+            {/* Flap highlight */}
+            <path d="M14 2h92c6.6 0 12 5.4 12 12L66 50c-3.2 2.2-8.8 2.2-12 0L2 14C2 7.4 7.4 2 14 2z" fill="white" opacity="0.1"/>
+          </svg>
+          {/* Check badge */}
+          {phase === "done" && (
+            <div style={{
+              position: "absolute", bottom: 12, right: 6,
+              width: 36, height: 36, borderRadius: 18,
+              background: C.gn500,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 3px 12px rgba(3,178,108,0.35)",
+              animation: "checkPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards",
+            }}>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 10.5l3.5 3.5L15 7" stroke={C.w} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+          )}
+        </div>
+
+        {/* Status text */}
+        <div style={{
+          ...T.t3(700), color: C.g900, textAlign: "center", marginBottom: 8,
+          ...(phase === "done" ? { animation: "textFadeUp 0.4s ease 0.2s both" } : {}),
+        }}>
+          {phase === "sending" ? "보내는 중..." : "보냈어요"}
+        </div>
+        {phase === "done" && (
+          <div style={{
+            ...T.t6(400), color: C.g500, textAlign: "center",
+            animation: "textFadeUp 0.4s ease 0.35s both",
+          }}>
+            입주 상태 사진이 집주인에게 전송됐어요
+          </div>
+        )}
+        {phase === "sending" && (
+          <div style={{ marginTop: 24, display: "flex", gap: 6 }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                width: 8, height: 8, borderRadius: 4, background: C.b300,
+                animation: `dotPulse 1.2s ease-in-out ${i * 0.2}s infinite`,
+              }} />
+            ))}
+          </div>
+        )}
+      </div>
+      {phase === "done" && (
+        <BCTA label="완료" onClick={() => { completeStep("a4"); go("home_post"); }} />
+      )}
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// 입주 보호 완료 인터스티셜
+// ═══════════════════════════════════════════════════════
+function PostDoneScreen({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="" onBack={null} />
+      <style>{`
+        @keyframes shieldEnter {
+          0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+          50% { transform: scale(1.1) translateY(-4px); opacity: 1; }
+          70% { transform: scale(0.95) translateY(2px); }
+          100% { transform: scale(1) translateY(0); }
+        }
+        @keyframes postCheckDraw {
+          0% { stroke-dashoffset: 44; opacity: 1; }
+          100% { stroke-dashoffset: 0; opacity: 1; }
+        }
+        @keyframes postTextUp {
+          0% { transform: translateY(12px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+      `}</style>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+        <div style={{
+          width: 120, height: 120, marginBottom: 36,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          animation: "shieldEnter 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
+        }}>
+          <svg width="100" height="110" viewBox="0 0 100 110" fill="none">
+            <defs>
+              <linearGradient id="shieldGrad" x1="50" y1="5" x2="50" y2="100" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="#64a8ff"/>
+                <stop offset="1" stopColor="#3182f6"/>
+              </linearGradient>
+            </defs>
+            <path d="M50 8L14 26v28c0 24 15.4 46 36 51 20.6-5 36-27 36-51V26L50 8z" fill="url(#shieldGrad)"/>
+            <path d="M50 8L14 26v28c0 24 15.4 46 36 51 20.6-5 36-27 36-51V26L50 8z" fill="white" opacity="0.08"/>
+            <path d="M33 55l12 12 22-24" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="44" strokeDashoffset="44"
+              style={{ opacity: 0, animation: "postCheckDraw 0.6s ease 0.5s forwards" }}/>
+          </svg>
+        </div>
+        <div style={{
+          ...T.t3(700), color: C.g900, textAlign: "center", marginBottom: 8,
+          animation: "postTextUp 0.4s ease 0.15s both",
+        }}>
+          보호가 완료됐어요
+        </div>
+        <div style={{ ...T.t6(400), color: C.g500, textAlign: "center", lineHeight: "24px", whiteSpace: "pre-line", animation: "postTextUp 0.4s ease 0.3s both" }}>
+          {"전입신고, 확정일자, 증거 전송까지\n모든 입주 보호 절차가 끝났어요"}
+        </div>
+      </div>
+      <BCTA label="확인" onClick={() => go("home_live")} />
+    </>
+  );
+}
+
+function ContractDoneScreen({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="" onBack={null} />
+      <style>{`
+        @keyframes circleEnter {
+          0% { transform: scale(0.3) translateY(20px); opacity: 0; }
+          50% { transform: scale(1.1) translateY(-4px); opacity: 1; }
+          70% { transform: scale(0.95) translateY(2px); }
+          100% { transform: scale(1) translateY(0); }
+        }
+        @keyframes doneCheckDraw {
+          0% { stroke-dashoffset: 60; opacity: 1; }
+          100% { stroke-dashoffset: 0; opacity: 1; }
+        }
+        @keyframes doneTextUp {
+          0% { transform: translateY(12px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+      `}</style>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+        <div style={{
+          width: 120, height: 120, marginBottom: 36,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          animation: "circleEnter 0.7s cubic-bezier(0.34,1.56,0.64,1) forwards",
+        }}>
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+            <defs>
+              <linearGradient id="circleGrad" x1="50" y1="5" x2="50" y2="95" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="#64a8ff"/>
+                <stop offset="1" stopColor="#3182f6"/>
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="45" fill="url(#circleGrad)"/>
+            <path d="M30 52l14 14 26-28" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"
+              strokeDasharray="60" strokeDashoffset="60"
+              style={{ opacity: 0, animation: "doneCheckDraw 0.6s ease 0.5s forwards" }}/>
+          </svg>
+        </div>
+        <div style={{
+          ...T.t3(700), color: C.g900, textAlign: "center", marginBottom: 8,
+          animation: "doneTextUp 0.4s ease 0.15s both",
+        }}>
+          계약이 마무리됐어요
+        </div>
+        <div style={{ ...T.t6(400), color: C.g500, textAlign: "center", lineHeight: "24px", whiteSpace: "pre-line", animation: "doneTextUp 0.4s ease 0.3s both" }}>
+          {"보증금 반환까지\n모든 절차가 완료됐어요"}
+        </div>
+      </div>
+      <BCTA label="새 계약 등록하기" onClick={() => go("home_pre")} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// B1-a — 만기 대응
+// ═══════════════════════════════════════════════════════
+function B1aMain({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="만기 대응" onBack={() => go("home_expiry")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="어떻게 하시겠어요?" desc="결정하지 않으면 동일 조건으로 자동 연장돼요." />
+        <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <SelBtn onClick={() => go("b1a_renew")}>
+          <IC bg={C.b50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}>
+            <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>연장할게요</div>
+            <div style={{ ...T.t7(400), color: C.g500 }}>세 가지 연장 방법을 확인해요</div>
+          </div>
+          <Chev />
+        </SelBtn>
+        <SelBtn onClick={() => go("b1a_exit")}>
+          <IC bg={C.o50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke={C.o500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}>
+            <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>퇴거할게요</div>
+            <div style={{ ...T.t7(400), color: C.g500 }}>집주인에게 퇴거 의사를 알려드려요</div>
+          </div>
+          <Chev />
+        </SelBtn>
+      </div>
+      <div style={{ padding: "12px 24px 0" }}>
+        <div onClick={() => go("home_live")} style={{ background: C.g50, borderRadius: 16, padding: "20px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+          <div>
+            <div style={{ ...T.t6(500), color: C.g700 }}>이미 연장을 완료했나요?</div>
+          </div>
+          <Chev />
+        </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function B1aExit({ go }) {
+  const [method, setMethod] = useState(null);
+  return (
+    <>
+      <SBar />
+      <Nav title="퇴거 의사 알리기" onBack={() => go("b1a_main")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+        <PH title="집주인에게" accent="퇴거 의사를 알려주세요" desc={"만기 전까지 알려야 자동 연장을 막을 수 있어요."} />
+        <div style={{ padding: "20px 24px" }}>
+          <div style={{ ...T.t7(500), color: C.g600, marginBottom: 12 }}>전달 내용</div>
+          <div style={{ border: `1px solid ${C.g200}`, borderRadius: 16, overflow: "hidden" }}>
+            <div style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 18, background: C.g100, display: "flex", alignItems: "center", justifyContent: "center" }}><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke={C.g400} strokeWidth="2"/><path d="M4 21v-1a6 6 0 0112 0v1" stroke={C.g400} strokeWidth="2" strokeLinecap="round"/></svg></div>
+              <div style={{ flex: 1 }}>
+                <span style={{ ...T.t6(500), color: C.g900, display: "block" }}>집주인 ({contract.landlord})</span>
+              </div>
+            </div>
+            <div style={{ height: 1, background: C.g100 }} />
+            <div style={{ padding: "16px 20px 12px" }}>
+              <span style={{ ...T.t6(400), color: C.g800, display: "block", lineHeight: "23px", whiteSpace: "pre-line" }}>
+                {`안녕하세요. ${contract.address} 세입자입니다.\n\n임대차 계약 만기일(${contract.expiry})에 맞추어 계약을 갱신하지 않고 퇴거할 예정임을 알려드립니다.\n\n보증금 ${contract.deposit}의 반환을 만기일까지 부탁드립니다.`}
+              </span>
+            </div>
+            <div style={{ padding: "4px 20px 16px", display: "flex", justifyContent: "flex-end" }}>
+              <span style={{ ...T.t7(400), color: C.g400, cursor: "pointer" }}>내용 수정</span>
+            </div>
+          </div>
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <span style={{ ...T.t7(500), color: C.g600, textUnderlineOffset: 3, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>퇴거 통보서 다운받기</span>
+          </div>
+        </div>
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ ...T.t7(500), color: C.g600, marginBottom: 12 }}>발송 방법</div>
+          {[{ id: "official", label: "인터넷 우체국", tag: "권장", desc: "내용증명으로 발송해요.\n우체국이 내용을 공적으로 증명해줘요." },
+            { id: "message", label: "문자", tag: null, desc: "간편하지만 분쟁 시 증거력이 약할 수 있어요." }
+          ].map(m => (
+            <button key={m.id} onClick={() => setMethod(m.id)} style={{
+              width: "100%", textAlign: "left", cursor: "pointer", padding: "16px 24px", marginBottom: 12,
+              background: method === m.id ? C.b50 : C.w,
+              borderRadius: 16, border: method === m.id ? `2px solid ${C.b500}` : `1px solid ${C.g200}`,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span style={{ ...T.t6(500), color: C.g900 }}>{m.label}</span>
+                {m.tag && <span style={{ ...T.s13(600), color: C.b600, background: C.b50, padding: "2px 8px", borderRadius: 8 }}>{m.tag}</span>}
+              </div>
+              <div style={{ ...T.t7(400), color: C.g600, wordBreak: "keep-all", whiteSpace: "pre-line", textWrap: "balance" }}>{m.desc}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+      <BCTA label={method === "official" ? "인터넷우체국으로 이동" : method === "message" ? "문자 앱으로 이동" : "발송 방법을 선택해주세요"} enabled={!!method} onClick={() => method && go("b1a_exit_sent")} icon={method ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke={method ? C.w : C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg> : null} />
+    </>
+  );
+}
+
+function B1aExitSent({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="퇴거 의사 알리기" onBack={() => go("b1a_exit")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="퇴거 의사를" accent="전달하셨나요?" desc="전달을 완료했다면 기록을 저장해드려요." />
+        <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <SelBtn onClick={() => go("home_exit_done")}>
+          <IC bg={C.b50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M22 4L12 14.01l-3-3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}>
+            <div style={{ ...T.t6(500), color: C.g900 }}>네, 전달했어요</div>
+          </div>
+          <Chev />
+        </SelBtn>
+        <SelBtn onClick={() => {}} style={{ opacity: 0.45, cursor: "default" }}>
+          <IC bg={C.g100}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke={C.g500} strokeWidth="2" /><path d="M12 6v6l4 2" stroke={C.g500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}>
+            <div style={{ ...T.t6(500), color: C.g900 }}>아직 전달하지 않았어요</div>
+          </div>
+          <Chev />
+        </SelBtn>
+      </div>
+      </div>
+    </>
+  );
+}
+
+function B1aRenew({ go }) {
+  const [open, setOpen] = useState(-1);
+  const cards = [
+    { num: "1", name: "집주인과 직접 협의", tag: "가장 일반적", desc: "집주인과 조건을 협의해서\n새 계약서를 작성하는 방법이에요.", details: [{ label: "조건", value: "보증금·월세 자유롭게 조정 가능" }, { label: "내용", value: "새 계약서 작성 필요" }, { label: "참고", value: "합의 내용은 반드시 서면으로 남기세요" }], color: C.b400 },
+    { num: "2", name: "묵시적 갱신", tag: "별도 조치 불필요", desc: "양측 모두 아무 의사 표시를 하지 않으면\n동일 조건으로 자동 연장돼요.", details: [{ label: "조건", value: "보증금·월세 동일" }, { label: "내용", value: "계약 기간 2년 연장" }, { label: "참고", value: "기존 대항력·우선변제권 유지" }], color: C.b500 },
+    { num: "3", name: "계약갱신청구권", tag: "1회 한정", desc: "집주인이 거절하더라도 세입자가\n1회에 한해 2년 연장을 요구할 수 있는 권리예요.", details: [{ label: "조건", value: "만기 6개월~2개월 전에 행사" }, { label: "내용", value: "1회 한정, 2년 보장" }, { label: "참고", value: "임대료 인상은 5% 이내로 제한" }], color: C.b600 },
+  ];
+  return (
+    <>
+      <SBar />
+      <Nav title="계약 연장 안내" onBack={() => go("b1a_main")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+        <PH title="계약을 연장하는" accent="세 가지 방법" />
+        <div style={{ padding: "20px 24px 12px" }}>
+        {cards.map((c, i) => {
+          const isOpen = open === i;
+          return (
+            <div key={i} style={{ background: C.w, border: `1px solid ${C.g200}`, borderRadius: 20, padding: 20, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <div style={{ width: 24, height: 24, borderRadius: 12, background: c.color, display: "flex", alignItems: "center", justifyContent: "center", ...T.s13(600), color: C.w }}>{c.num}</div>
+                <span style={{ ...T.t6(600), color: C.g900 }}>{c.name}</span>
+                <span style={{ ...T.s13(500), color: c.color, background: C.b50, padding: "2px 8px", borderRadius: 8 }}>{c.tag}</span>
+              </div>
+              <div style={{ ...T.t7(400), color: C.g700, marginBottom: 12, wordBreak: "keep-all", whiteSpace: "pre-line", textWrap: "balance" }}>{c.desc}</div>
+              <button onClick={() => setOpen(isOpen ? -1 : i)} style={{
+                background: "none", border: "none", padding: 0, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 4, marginBottom: isOpen ? 12 : 0,
+              }}>
+                <span style={{ ...T.t7(500), color: c.color }}>{isOpen ? "접기" : "자세히 보기"}</span>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                  <path d="M3.5 5.25L7 8.75l3.5-3.5" stroke={c.color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {isOpen && (
+                <div style={{ background: C.g50, borderRadius: 12, overflow: "hidden" }}>
+                  {c.details.map((d, j) => (
+                    <div key={j} style={{ padding: "10px 16px", display: "flex", alignItems: "baseline", gap: 8 }}>
+                      <span style={{ ...T.s13(500), color: c.color, flexShrink: 0, minWidth: 28 }}>{d.label}</span>
+                      <span style={{ ...T.t7(400), color: C.g700 }}>{d.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      </div>
+      <BCTA label="확인했어요" onClick={() => go("home_expiry_done")} />
+    </>
+  );
+}
+
+function B1aResult({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="만기 대응 결과" onBack={() => go("home_expiry_done")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="만기 대응은" accent="어떻게 되었나요?" />
+        <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <SelBtn onClick={() => go("home_live")}>
+          <IC bg={C.gn50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke={C.gn500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}>
+            <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>연장 완료했어요</div>
+            <div style={{ ...T.t7(400), color: C.g500 }}>새 계약 기간으로 거주를 계속해요</div>
+          </div>
+          <Chev />
+        </SelBtn>
+        <SelBtn onClick={() => go("b1a_exit")}>
+          <IC bg={C.o50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke={C.o500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}>
+            <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>퇴거하기로 했어요</div>
+            <div style={{ ...T.t7(400), color: C.g500 }}>퇴거 의사를 집주인에게 통보해요</div>
+          </div>
+          <Chev />
+        </SelBtn>
+      </div>
+      <div style={{ padding: "12px 24px 0" }}>
+        <div onClick={() => go("b1a_renew")} style={{ background: C.g50, borderRadius: 16, padding: "20px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+          <div>
+            <div style={{ ...T.t6(500), color: C.g700 }}>연장 방법 다시 보기</div>
+            <div style={{ ...T.t7(400), color: C.g400, marginTop: 2 }}>세 가지 연장 방법을 다시 확인해요</div>
+          </div>
+          <Chev />
+        </div>
+      </div>
+      </div>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// B1-b — 보증금 돌려받았나요?
+// ═══════════════════════════════════════════════════════
+function B1bMain({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="보증금 확인" onBack={() => go("home_postexpiry")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="보증금을 돌려받으셨나요?" desc={`보증금 ${contract.deposit}의 반환 여부를 확인해주세요.\n미반환 시 법적으로 요청할 수 있어요.`} />
+        <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <SelBtn onClick={() => go("home_done")}>
+          <IC bg={C.gn50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke={C.gn500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>네, 돌려받았어요</div><div style={{ ...T.t7(400), color: C.g500 }}>보증금 반환이 완료됐어요</div></div>
+          <Chev />
+        </SelBtn>
+        <SelBtn onClick={() => go("b1b_dispute")}>
+          <IC bg={C.r50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={C.r500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>아니요, 못 받았어요</div><div style={{ ...T.t7(400), color: C.g500 }}>보증금 반환 요청을 도와드려요</div></div>
+          <Chev />
+        </SelBtn>
+      </div>
+      </div>
+    </>
+  );
+}
+
+function B1bDispute({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="보증금 확인" onBack={() => go("b1b_main")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+        <PH title="보증금을 돌려받을 수 있도록" accent="단계별로 안내해드릴게요" desc="상황에 맞는 대응 방법을 하나씩 알려드려요." />
+        <div style={{ padding: "24px 24px 0" }}>
+        {[{ n: "1", t: "집주인 연락 상태 확인", d: "연락 가능 여부를 먼저 파악해요" },
+          { n: "2", t: "보증금 반환 요청서 발송", d: "내용증명으로 법적 요청 증거를 남겨요" },
+          { n: "3", t: "대항력 보전", d: "이사해도 보증금을 보호할 수 있어요" },
+          { n: "4", t: "분쟁 경로 선택", d: "소액심판, 지급명령 등 최적 경로를 안내해요" },
+        ].map((s, i) => (
+          <div key={i} style={{ display: "flex", gap: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 24 }}>
+              <div style={{ width: 24, height: 24, borderRadius: 12, background: i === 0 ? C.b500 : C.g100, display: "flex", alignItems: "center", justifyContent: "center", ...T.s13(600), color: i === 0 ? C.w : C.g400 }}>{s.n}</div>
+              {i < 3 && <div style={{ width: 2, flex: 1, minHeight: 28, background: C.g200, marginTop: 4, marginBottom: 4, borderRadius: 1 }} />}
+            </div>
+            <div style={{ flex: 1, opacity: i === 0 ? 1 : 0.5, paddingBottom: i < 3 ? 24 : 0 }}>
+              <div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>{s.t}</div>
+              <div style={{ ...T.t7(400), color: C.g500 }}>{s.d}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      </div>
+      <BCTA label="집주인 연락 상태 확인하기" onClick={() => go("b2a")} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// B2a, B2b — 분기 질문
+// ═══════════════════════════════════════════════════════
+function B2aScreen({ go, from }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="보증금 반환 요청" onBack={() => go(from || "home_dispute")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="집주인과 연락이 되나요?" desc={"보증금 반환을 요청하려면\n먼저 연락 가능 여부를 확인해야 해요."} />
+      <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <SelBtn onClick={() => go("b2b")}>
+          <IC bg={C.gn50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke={C.gn500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>네, 연락돼요</div><div style={{ ...T.t7(400), color: C.g500 }}>전화, 문자 등으로 연락할 수 있어요</div></div>
+          <Chev />
+        </SelBtn>
+        <SelBtn onClick={() => go("b21_compose")}>
+          <IC bg={C.o50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={C.o500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>아니요, 연락이 안 돼요</div><div style={{ ...T.t7(400), color: C.g500 }}>전화, 문자 모두 응답이 없어요</div></div>
+          <Chev />
+        </SelBtn>
+      </div>
+      </div>
+    </>
+  );
+}
+
+function B2bScreen({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="보증금 반환 요청" onBack={() => go("b2a")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="집주인이 보증금을" accent="돌려주겠다고 했나요?" desc={"반환 의사를 확인해야\n다음 대응을 안내할 수 있어요."} />
+      <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <SelBtn onClick={() => go("b2b_agree")}>
+          <IC bg={C.gn50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke={C.gn500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>네, 돌려주겠다고 했어요</div><div style={{ ...T.t7(400), color: C.g500 }}>반환 일정을 합의하면 돼요</div></div>
+          <Chev />
+        </SelBtn>
+        <SelBtn onClick={() => go("b21_compose")}>
+          <IC bg={C.r50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={C.r500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>아니요, 거부했어요</div><div style={{ ...T.t7(400), color: C.g500 }}>내용증명으로 공식 요청할 수 있어요</div></div>
+          <Chev />
+        </SelBtn>
+      </div>
+      </div>
+    </>
+  );
+}
+
+function B2bAgree({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="반환 일정 합의" onBack={() => go("b2b")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+        <PH title="반환 약속을" accent="기록으로 남기세요" desc="구두 약속은 증거가 되지 않아요. 문자로 합의 내용을 남겨두세요." />
+        <div style={{ padding: "24px 24px 0" }}>
+        <div style={{ ...T.t6(500), color: C.g600, marginBottom: 12 }}>이렇게 보내세요</div>
+        <div style={{ background: C.g50, borderRadius: 16, padding: "12px 16px 8px" }}>
+          <div style={{ background: C.w, borderRadius: 12, padding: "16px 16px", ...T.t7(400), color: C.g800, whiteSpace: "pre-line", wordBreak: "keep-all" }}>
+            {`안녕하세요. 보증금 반환 관련 내용 확인차 연락드립니다.\n\n말씀하신 대로 보증금 1,000만원을 [날짜]까지 반환해주시는 것으로 확인됩니다.\n\n반환 계좌: [내 계좌번호]\n\n확인 부탁드립니다.`}
+          </div>
+          <button onClick={() => { navigator.clipboard?.writeText("안녕하세요. 보증금 반환 관련 내용 확인차 연락드립니다.\n\n말씀하신 대로 보증금 1,000만원을 [날짜]까지 반환해주시는 것으로 확인됩니다.\n\n반환 계좌: [내 계좌번호]\n\n확인 부탁드립니다."); }} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%", marginTop: 8, padding: "6px 0", background: "none", border: "none", cursor: "pointer" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke={C.b500} strokeWidth="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke={C.b500} strokeWidth="2" strokeLinecap="round" /></svg>
+            <span style={{ ...T.t7(500), color: C.b500 }}>내용 복사하기</span>
+          </button>
+        </div>
+      </div>
+      <div style={{ padding: "20px 24px" }}>
+        <div style={{ background: C.b50, borderRadius: 12, padding: "16px 20px" }}>
+          <div style={{ ...T.t7(500), color: C.b700, marginBottom: 4 }}>합의 후에도 미반환이라면?</div>
+          <div style={{ ...T.t7(400), color: C.g600, wordBreak: "keep-all" }}>약속한 날짜까지 반환되지 않으면, 내용증명을 통해 공식 요청할 수 있어요.</div>
+        </div>
+      </div>
+      </div>
+      <BCTA label="문자 앱으로 이동" onClick={() => go("b2b_agree_sent")} icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} />
+    </>
+  );
+}
+
+function B2bAgreeSent({ go }) {
+  const [sent, setSent] = useState(false);
+  return (
+    <>
+      <SBar />
+      <Nav title="반환 일정 합의" onBack={() => go("b2b_agree")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+      {!sent ? (
+        <>
+          <PH title="합의 내용을" accent="보내셨나요?" desc="문자로 보냈다면 기록을 저장해드려요." />
+          <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+            <SelBtn onClick={() => setSent(true)}>
+              <IC bg={C.b50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M22 4L12 14.01l-3-3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+              <div style={{ flex: 1 }}>
+                <div style={{ ...T.t6(500), color: C.g900 }}>네, 보냈어요</div>
+              </div>
+              <Chev />
+            </SelBtn>
+            <SelBtn onClick={() => {}} style={{ opacity: 0.45, cursor: "default" }}>
+              <IC bg={C.g100}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke={C.g500} strokeWidth="2" /><path d="M12 6v6l4 2" stroke={C.g500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+              <div style={{ flex: 1 }}>
+                <div style={{ ...T.t6(500), color: C.g900 }}>아직 보내지 않았어요</div>
+              </div>
+              <Chev />
+            </SelBtn>
+          </div>
+        </>
+      ) : (
+        <>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+            <div style={{ width: 80, height: 80, borderRadius: 40, background: C.b50, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M22 4L12 14.01l-3-3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </div>
+            <div style={{ ...T.t2(700), color: C.g900, textAlign: "center", marginBottom: 8 }}>합의 기록이 저장됐어요</div>
+            <div style={{ ...T.t6(400), color: C.g600, textAlign: "center" }}>약속한 날짜에 보증금이 반환되면<br />계약이 마무리돼요.</div>
+          </div>
+          <BCTA label="확인" onClick={() => go("home_agree_wait")} />
+        </>
+      )}
+      </div>
+    </>
+  );
+}
+
+function B2bReturn({ go }) {
+  return (
+    <>
+      <SBar />
+      <Nav title="보증금 확인" onBack={() => go("home_agree_wait")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto" }}>
+        <PH title="보증금을 돌려받으셨나요?" desc={`합의한 날짜가 지났다면 반환 여부를 확인해주세요.\n미반환 시 내용증명으로 공식 요청할 수 있어요.`} />
+        <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <SelBtn onClick={() => go("home_done")}>
+          <IC bg={C.gn50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke={C.gn500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>네, 돌려받았어요</div><div style={{ ...T.t7(400), color: C.g500 }}>보증금 반환이 완료됐어요</div></div>
+          <Chev />
+        </SelBtn>
+        <SelBtn onClick={() => go("b21_compose")}>
+          <IC bg={C.r50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke={C.r500} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+          <div style={{ flex: 1 }}><div style={{ ...T.t6(500), color: C.g900, marginBottom: 4 }}>아니요, 못 받았어요</div><div style={{ ...T.t7(400), color: C.g500 }}>내용증명으로 공식 반환을 요청해요</div></div>
+          <Chev />
+        </SelBtn>
+      </div>
+      </div>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// B2-1 — 보증금 반환 요청서 (내용증명)
+// ═══════════════════════════════════════════════════════
+function B21Compose({ go, from, bank, setBank, accountNum, setAccountNum }) {
+  const autoReason = (from === "b2b" || from === "b2b_return") ? "breach" : "expiry";
+  const [reason, setReason] = useState(autoReason);
+  const [deadline, setDeadline] = useState("14");
+  const [bankOpen, setBankOpen] = useState(false);
+  const banks = ["국민은행", "신한은행", "하나은행", "우리은행", "농협은행", "카카오뱅크", "토스뱅크", "기업은행", "SC제일은행", "대구은행"];
+  const accountFilled = bank && accountNum.length >= 8;
+  return (
+    <>
+      <SBar />
+      <Nav title="보증금 반환 요청서" onBack={() => go(from || "b2a")} />
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 120 }}>
+        <PH title="반환 요청서를" accent="자동으로 만들어드려요" />
+        <div style={{ padding: "20px 24px 24px" }}>
+          <div style={{ background: C.b50, borderRadius: 12, padding: "12px 20px", display: "flex", alignItems: "flex-start", gap: 8 }}>
+            <span style={{ ...T.t7(400), color: C.b600 }}>이 요청서는 "보증금을 돌려주세요"라는 공식 요청이에요. 앞서 보낸 퇴거 통보와는 목적이 달라요.</span>
+          </div>
+        </div>
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ ...T.t6(500), color: C.g600, marginBottom: 12 }}>계약 정보 (자동 입력)</div>
+          <div style={{ background: C.g50, borderRadius: 16, padding: "16px 20px" }}>
+            {[["임대인", contract.landlord], ["임차인", contract.tenant], ["주소", contract.address], ["보증금", contract.deposit], ["계약 기간", contract.period]].map(([l, v], i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: i < 4 ? `1px solid ${C.g100}` : "none" }}>
+                <span style={{ ...T.t6(400), color: C.g500 }}>{l}</span>
+                <span style={{ ...T.t6(500), color: C.g800 }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ height: 32 }} />
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ ...T.t6(500), color: C.g600, marginBottom: 12 }}>반환 요청 사유</div>
+          {[{ id: "expiry", l: "계약 만기" }, { id: "early", l: "중도 해지 합의" }, { id: "breach", l: "임대인 의무 불이행" }].map(r => {
+            const disabled = r.id !== autoReason;
+            return (
+            <button key={r.id} onClick={() => !disabled && setReason(r.id)} style={{
+              width: "100%", textAlign: "left", cursor: disabled ? "default" : "pointer", padding: "16px 24px", borderRadius: 12, marginBottom: 8,
+              background: reason === r.id ? C.b50 : C.w, border: reason === r.id ? `2px solid ${C.b500}` : `1px solid ${disabled ? C.g100 : C.g200}`,
+              opacity: disabled ? 0.45 : 1,
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <div style={{ width: 24, height: 24, borderRadius: 12, border: reason === r.id ? `7px solid ${C.b500}` : `2px solid ${disabled ? C.g200 : C.g300}`, background: C.w, flexShrink: 0 }} />
+              <span style={{ ...T.t6(500), color: disabled ? C.g400 : C.g900 }}>{r.l}</span>
+            </button>
+            );
+          })}
+        </div>
+        <div style={{ height: 32 }} />
+        {/* 반환 계좌 입력 */}
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <span style={{ ...T.t6(500), color: C.g600 }}>반환받을 계좌</span>
+            {!accountFilled && <span style={{ ...T.s13(500), color: C.r500, background: C.r50, padding: "2px 8px", borderRadius: 4 }}>필수</span>}
+            {accountFilled && <span style={{ ...T.s13(500), color: C.gn500, background: C.gn50, padding: "2px 8px", borderRadius: 4 }}>입력 완료</span>}
+          </div>
+          {/* 은행 선택 드롭다운 */}
+          <div style={{ position: "relative", marginBottom: 8 }}>
+            <button onClick={() => setBankOpen(!bankOpen)} style={{
+              width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "16px 20px", borderRadius: 12, cursor: "pointer",
+              background: C.w, border: `1.5px solid ${bank ? C.b500 : C.g200}`,
+            }}>
+              <span style={{ ...T.t6(bank ? 500 : 400), color: bank ? C.g900 : C.g400 }}>{bank || "은행을 선택하세요"}</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ transform: bankOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                <path d="M5 7.5l5 5 5-5" stroke={C.g400} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {bankOpen && (
+              <div style={{
+                position: "absolute", top: "100%", left: 0, right: 0, zIndex: 10, marginTop: 4,
+                background: C.w, borderRadius: 12, border: `1px solid ${C.g200}`,
+                boxShadow: "0 8px 24px rgba(0,0,0,0.08)", maxHeight: 200, overflowY: "auto",
+              }}>
+                {banks.map((b, i) => (
+                  <button key={b} onClick={() => { setBank(b); setBankOpen(false); }} style={{
+                    width: "100%", textAlign: "left", padding: "12px 20px", cursor: "pointer",
+                    background: bank === b ? C.b50 : C.w, border: "none",
+                    borderBottom: i < banks.length - 1 ? `1px solid ${C.g100}` : "none",
+                    ...T.t6(bank === b ? 600 : 400), color: bank === b ? C.b600 : C.g800,
+                  }}>{b}</button>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* 계좌번호 입력 */}
+          <div style={{
+            display: "flex", alignItems: "center", padding: "16px 20px",
+            borderRadius: 12, border: `1.5px solid ${accountNum ? C.b500 : C.g200}`, background: C.w,
+          }}>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="계좌번호를 입력하세요"
+              value={accountNum}
+              onChange={e => setAccountNum(e.target.value.replace(/[^0-9-]/g, ""))}
+              style={{
+                flex: 1, border: "none", outline: "none", background: "none",
+                ...T.t6(500), color: C.g900,
+              }}
+            />
+            {accountNum && (
+              <button onClick={() => setAccountNum("")} style={{
+                background: C.g200, border: "none", borderRadius: 10, width: 20, height: 20,
+                display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
+              }}>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke={C.g500} strokeWidth="1.5" strokeLinecap="round" /></svg>
+              </button>
+            )}
+          </div>
+          {!accountFilled && (
+            <div style={{ ...T.s13(400), color: C.g400, marginTop: 8, paddingLeft: 4 }}>보증금을 돌려받을 본인 명의 계좌를 입력해주세요</div>
+          )}
+        </div>
+        <div style={{ height: 32 }} />
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ ...T.t6(500), color: C.g600, marginBottom: 12 }}>반환 요청 기한</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {[{ id: "14", l: "14일", tag: "권장" }, { id: "30", l: "30일" }, { id: "custom", l: "직접 입력" }].map(d => (
+              <button key={d.id} onClick={() => setDeadline(d.id)} style={{
+                flex: 1, padding: "12px 0", borderRadius: 12, cursor: "pointer", textAlign: "center", position: "relative",
+                background: deadline === d.id ? C.b50 : C.w, border: deadline === d.id ? `2px solid ${C.b500}` : `1px solid ${C.g200}`,
+              }}>
+                <span style={{ ...T.t6(deadline === d.id ? 600 : 400), color: deadline === d.id ? C.b600 : C.g700 }}>{d.l}</span>
+                {d.tag && <span style={{ position: "absolute", top: -8, right: -4, ...T.s13(600), color: C.gn600, background: C.gn50, padding: "1px 6px", borderRadius: 4 }}>{d.tag}</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <BCTA label="반환요청서 생성하기" onClick={() => go("b21_preview")} enabled={accountFilled} />
+    </>
+  );
+}
+
+function B21Preview({ go, bank, accountNum }) {
+  const accountDisplay = bank && accountNum ? `${bank} ${accountNum}` : "";
+  return (
+    <>
+      <SBar />
+      <Nav title="반환 요청서" onBack={() => go("b21_compose")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+        <PH title="내용증명으로 발송돼요" desc="우체국이 발송 내용과 일시를 공적으로 증명해줘요." />
+        <div style={{ padding: "20px 24px" }}>
+          {/* 요청서 카드 */}
+          <div style={{ border: `1px solid ${C.g200}`, borderRadius: 16, overflow: "hidden" }}>
+            <div style={{ padding: "24px 20px" }}>
+              <div style={{ textAlign: "center", ...T.t5(600), color: C.g900, marginBottom: 24 }}>보 증 금  반 환  요 청 서</div>
+              <div style={{ ...T.t7(400), color: C.g800, whiteSpace: "pre-line" }}>
+                {`수 신: ${contract.landlord}\n\n발 신: ${contract.tenant}\n\n1. 아래 임대차계약에 관하여 보증금 반환을 요청합니다.\n   - 임대 목적물: ${contract.address}\n   - 보증금: ${contract.deposit}\n   - 계약 기간: ${contract.period}\n\n2. 위 계약은 ${contract.expiry}자로 만기 종료되었으나, 보증금이 반환되지 않고 있습니다.\n\n3. 본 내용증명 도달일로부터 14일 이내에 보증금 전액을 아래 계좌로 반환하여 주시기 바랍니다.`}
+              </div>
+              <div style={{ background: C.b50, borderRadius: 8, padding: "12px 16px", margin: "12px 0" }}>
+                <div style={{ ...T.t7(400), color: C.g500, marginBottom: 4 }}>반환 계좌</div>
+                <div style={{ ...T.t6(600), color: C.b600 }}>{accountDisplay}</div>
+              </div>
+              <div style={{ ...T.t7(400), color: C.g800, whiteSpace: "pre-line" }}>
+                {`4. 기한 내 반환되지 않을 경우, 법적 절차를 진행할 수 있음을 알려드립니다.`}
+              </div>
+            </div>
+          </div>
+          {/* 다운받기 */}
+          <div style={{ textAlign: "center", marginTop: 16 }}>
+            <span style={{ ...T.t7(500), color: C.g600, textDecoration: "underline", textUnderlineOffset: 3, cursor: "pointer" }}>요청서 다운받기</span>
+          </div>
+        </div>
+      </div>
+      <BCTA label="인터넷우체국으로 이동" onClick={() => go("b21_sent")} icon={<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke={C.w} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>} />
+    </>
+  );
+}
+
+function B21Sent({ go }) {
+  const [sent, setSent] = useState(null);
+  return (
+    <>
+      <SBar />
+      <Nav title="반환 요청서" onBack={() => go("b21_preview")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}>
+      {sent === null ? (
+        <>
+          <PH title="인터넷우체국에서" accent="발송하셨나요?" desc="발송을 완료했다면 기록을 저장해드려요." />
+          <div style={{ padding: "24px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+            <SelBtn onClick={() => setSent(true)}>
+              <IC bg={C.b50}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M22 4L12 14.01l-3-3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+              <div style={{ flex: 1 }}>
+                <div style={{ ...T.t6(500), color: C.g900 }}>네, 발송했어요</div>
+              </div>
+              <Chev />
+            </SelBtn>
+            <SelBtn onClick={() => {}} style={{ opacity: 0.45, cursor: "default" }}>
+              <IC bg={C.g100}><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke={C.g500} strokeWidth="2" /><path d="M12 6v6l4 2" stroke={C.g500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+              <div style={{ flex: 1 }}>
+                <div style={{ ...T.t6(500), color: C.g900 }}>아직 발송하지 않았어요</div>
+              </div>
+              <Chev />
+            </SelBtn>
+          </div>
+        </>
+      ) : (
+        <>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+            <div style={{ width: 80, height: 80, borderRadius: 40, background: C.b50, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M22 4L12 14.01l-3-3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </div>
+            <div style={{ ...T.t2(700), color: C.g900, textAlign: "center", marginBottom: 8 }}>발송 기록이 저장됐어요</div>
+            <div style={{ ...T.t6(400), color: C.g600, textAlign: "center", marginBottom: 24 }}>반환 요청 기한(14일) 내에 반환되지 않으면<br />다음 단계를 안내해드려요.</div>
+            <div style={{ width: "100%", background: C.g50, borderRadius: 16, padding: "16px 20px" }}>
+              {[["문서", "보증금 반환 요청서"], ["발송일", "2027.04.10"], ["요청 금액", contract.deposit], ["반환 기한", "14일 이내"]].map(([l, v], i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: i < 3 ? `1px solid ${C.g100}` : "none" }}>
+                  <span style={{ ...T.t7(400), color: C.g500 }}>{l}</span><span style={{ ...T.t7(500), color: C.g800 }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <BCTA label="홈으로 돌아가기" onClick={() => go("home_dispute_sent")} />
+        </>
+      )}
+      </div>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// B3 — 필요 서류 안내 (선택한 분쟁 경로별)
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// B3 — 필요 서류 안내 (선택한 분쟁 경로별)
+// ═══════════════════════════════════════════════════════
+function B3Screen({ go, fixedPath }) {
+  const [expanded, setExpanded] = useState(null);
+
+  const pathNames = { sc: "소액사건심판", po: "지급명령", med: "분쟁조정" };
+
+  // type: app(앱 내 조회/생성), online(외부 사이트), offline(직접 방문)
+  const docsByPath = {
+    sc: [
+      { k: "sc_1", l: "소장 (소송 신청서)", d: "보증금 반환을 청구하는 소송 서류예요", type: "app", auto: true,
+        rows: [["내용", "보증금 반환 청구 취지·원인, 임대차 기간·계약 조건 기재"], ["준비", "계약서 정보 (앱에서 자동 입력)"]],
+        cta: { l: "앱에서 자동 작성하기", action: "app" } },
+      { k: "sc_2", l: "내용증명 발송 기록", d: "보증금 반환을 요청한 내역을 증명해요", type: "app",
+        rows: [["내용", "발송 일시·수신인·요청 금액·요청 내용 포함"], ["준비", "앱 내 발송 기록에서 조회"]],
+        cta: { l: "발송 기록 보기", action: "app" } },
+      { k: "sc_3", l: "등기부등본", d: "부동산의 소유자와 권리관계를 확인하는 서류예요", type: "online",
+        rows: [["내용", "소유자·근저당·압류 등 권리관계 전체"], ["준비", "인터넷등기소에서 발급 (수수료 1,000원)"]],
+        cta: { l: "인터넷등기소 바로가기", action: "link" } },
+      { k: "sc_4", l: "임대차 계약서 사본", d: "계약 조건을 증명하는 핵심 서류예요", type: "offline",
+        rows: [["내용", "보증금·월세·계약 기간·특약 사항 전체"], ["준비", "계약서 원본 지참"]],
+        cta: null },
+    ],
+    po: [
+      { k: "po_1", l: "지급명령 신청서", d: "돈을 갚으라는 법원 명령을 신청하는 서류예요", type: "app", auto: true,
+        rows: [["내용", "채권자·채무자 정보, 청구 금액, 청구 원인 기재"], ["준비", "계약서 정보 (앱에서 자동 입력)"]],
+        cta: { l: "앱에서 자동 작성하기", action: "app" } },
+      { k: "po_2", l: "내용증명 발송 기록", d: "보증금 반환을 요청한 내역을 증명해요", type: "app",
+        rows: [["내용", "발송 일시·수신인·요청 금액·요청 내용 포함"], ["준비", "앱 내 발송 기록에서 조회"]],
+        cta: { l: "발송 기록 보기", action: "app" } },
+      { k: "po_3", l: "등기부등본", d: "부동산의 소유자와 권리관계를 확인하는 서류예요", type: "online",
+        rows: [["내용", "소유자·근저당·압류 등 권리관계 전체"], ["준비", "인터넷등기소에서 발급 (수수료 1,000원)"]],
+        cta: { l: "인터넷등기소 바로가기", action: "link" } },
+      { k: "po_4", l: "임대차 계약서 사본", d: "계약 조건을 증명하는 핵심 서류예요", type: "offline",
+        rows: [["내용", "보증금·월세·계약 기간·특약 사항 전체"], ["준비", "계약서 원본 지참"]],
+        cta: null },
+    ],
+    med: [
+      { k: "med_1", l: "조정 신청서", d: "분쟁조정위원회에 조정을 신청하는 서류예요", type: "app", auto: true,
+        rows: [["내용", "분쟁 경위·요청 사항·당사자 정보 기재"], ["준비", "계약서 정보 (앱에서 자동 입력)"]],
+        cta: { l: "앱에서 자동 작성하기", action: "app" } },
+      { k: "med_2", l: "내용증명 발송 기록", d: "보증금 반환을 요청한 내역을 증명해요", type: "app",
+        rows: [["내용", "발송 일시·수신인·요청 금액·요청 내용 포함"], ["준비", "앱 내 발송 기록에서 조회"]],
+        cta: { l: "발송 기록 보기", action: "app" } },
+      { k: "med_3", l: "임대차 계약서 사본", d: "계약 조건을 증명하는 핵심 서류예요", type: "offline",
+        rows: [["내용", "보증금·월세·계약 기간·특약 사항 전체"], ["준비", "계약서 원본 지참"]],
+        cta: null },
+    ],
+  };
+
+  const docs = docsByPath[fixedPath];
+
+  const docIcon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+
+  /* ── Document Row (ListRow 패턴) ── */
+  const DocRow = ({ doc }) => {
+    const isOpen = expanded === doc.k;
+    return (
+      <div style={{ borderBottom: `1px solid ${C.g100}` }}>
+        <button onClick={() => setExpanded(isOpen ? null : doc.k)} style={{
+          width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 24px",
+          background: "none", border: "none", textAlign: "left", cursor: "pointer",
+        }}>
+          <IC bg={C.g50} size={40}>{docIcon}</IC>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ ...T.t6(600), color: C.g900 }}>{doc.l}</span>
+            </div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}>
+            <path d="M5 7.5l5 5 5-5" stroke={C.g400} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {isOpen && (
+          <div style={{ padding: "0 24px 20px" }}>
+            <div style={{ background: C.g50, borderRadius: 12, padding: "4px 16px" }}>
+              {doc.rows.map(([label, value], ri) => (
+                <div key={ri} style={{
+                  display: "flex", padding: "12px 0",
+                  borderBottom: ri < doc.rows.length - 1 ? `1px solid ${C.g100}` : "none",
+                }}>
+                  <span style={{ ...T.t7(500), color: C.g500, width: 48, flexShrink: 0 }}>{label}</span>
+                  <span style={{ ...T.t7(400), color: C.g800 }}>{value}</span>
+                </div>
+              ))}
+            </div>
+            {doc.cta && (
+              <button style={{
+                width: "100%", marginTop: 12, padding: "12px 16px", borderRadius: 12,
+                background: C.b50, border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              }}>
+                {doc.cta.action === "link" && <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                <span style={{ ...T.t6(500), color: C.b600 }}>{doc.cta.l}</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <SBar />
+      <Nav title="필요 서류" onBack={() => go("b4")} />
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
+        <PH title={`${pathNames[fixedPath]}에`} accent="필요한 서류" desc="각 항목을 눌러 준비 방법을 확인하세요." />
+
+        {/* Document list */}
+        {docs.map(doc => <DocRow key={doc.k} doc={doc} />)}
+
+        {/* 비용 안내 */}
+        {fixedPath !== "med" && (
+          <div style={{ padding: "16px 24px" }}>
+            <div style={{ background: C.g50, borderRadius: 16, padding: "16px 20px" }}>
+              <div style={{ ...T.t7(500), color: C.g600, marginBottom: 8 }}>법원 비용</div>
+              <div style={{ ...T.t6(400), color: C.g800, marginBottom: 4 }}>
+                {fixedPath === "sc" ? "인지대 약 10만원 + 송달료 별도" : "인지대는 소송의 1/10 수준"}
+              </div>
+              <div style={{ ...T.t7(400), color: C.g500 }}>
+                {fixedPath === "sc" ? "법원 내 은행 또는 카드로 납부해요" : "이의 시 소송 전환, 추가 인지대가 필요해요"}
+              </div>
+            </div>
+          </div>
+        )}
+        {fixedPath === "med" && (
+          <div style={{ padding: "16px 24px" }}>
+            <div style={{ background: C.g50, borderRadius: 16, padding: "16px 20px" }}>
+              <div style={{ ...T.t7(500), color: C.g600, marginBottom: 8 }}>조정 비용</div>
+              <div style={{ ...T.t6(400), color: C.g800 }}>신청 수수료 1~10만원</div>
+            </div>
+          </div>
+        )}
+
+        {/* 이사 예정이라면 — 조건부 추천 카드 */}
+        <div style={{ padding: "0 24px 8px" }}>
+          <div style={{ ...T.t7(500), color: C.g500, marginBottom: 10 }}>이사 예정이라면</div>
+          <button onClick={() => go("b3_move")} style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 12,
+            padding: "16px 20px", background: C.w, border: `1px solid ${C.g200}`,
+            borderRadius: 16, textAlign: "left", cursor: "pointer",
+          }}>
+            <IC bg={C.g50} size={40}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9 22V12h6v10" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </IC>
+            <div style={{ flex: 1 }}>
+              <div style={{ ...T.t6(600), color: C.g900 }}>임차권등기명령 안내</div>
+              <div style={{ ...T.t7(400), color: C.g500 }}>이사 후에도 보증금 보호를 유지하는 법원 명령이에요</div>
+            </div>
+            <Chev />
+          </button>
+        </div>
+      </div>
+      <BCTA label="홈으로 돌아가기" onClick={() => go("home_dispute_sent")} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// B3_MOVE — 이사 예정 서류 (임차권등기명령)
+// ═══════════════════════════════════════════════════════
+function B3MoveScreen({ go, from }) {
+  const [expanded, setExpanded] = useState(null);
+
+  const moveDocs = [
+    { k: "mv_1", l: "임차권등기명령 신청서", d: "이사 후 보증금 보호를 유지하는 서류예요", type: "app",
+      rows: [["내용", "이사 후에도 대항력·우선변제권 유지 신청"], ["준비", "계약서 정보 (앱에서 자동 입력)"]],
+      cta: { l: "앱에서 자동 작성하기", action: "app" } },
+    { k: "mv_2", l: "주민등록등본", d: "현재 거주지를 증명하는 서류예요", type: "online",
+      rows: [["내용", "현재 주소지 및 세대원 현황 증명"], ["준비", "정부24에서 무료 발급"]],
+      cta: { l: "정부24 바로가기", action: "link" } },
+    { k: "mv_3", l: "임대차 계약서 사본", d: "계약 조건을 증명하는 서류예요", type: "offline",
+      rows: [["내용", "보증금·월세·계약 기간·특약 사항 전체"], ["준비", "계약서 원본 지참"]],
+      cta: null },
+    { k: "mv_4", l: "신분증 사본", d: "본인 확인용 신분증이에요", type: "offline",
+      rows: [["내용", "본인 확인 (주민등록증 또는 운전면허증)"], ["준비", "원본 지참 후 창구에서 사본 제출"]],
+      cta: null },
+  ];
+
+  const docIcon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke={C.g600} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+
+  const DocRow = ({ doc }) => {
+    const isOpen = expanded === doc.k;
+    return (
+      <div style={{ borderBottom: `1px solid ${C.g100}` }}>
+        <button onClick={() => setExpanded(isOpen ? null : doc.k)} style={{
+          width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 24px",
+          background: "none", border: "none", textAlign: "left", cursor: "pointer",
+        }}>
+          <IC bg={C.g50} size={40}>{docIcon}</IC>
+          <div style={{ flex: 1 }}>
+            <span style={{ ...T.t6(600), color: C.g900 }}>{doc.l}</span>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}>
+            <path d="M5 7.5l5 5 5-5" stroke={C.g400} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        {isOpen && (
+          <div style={{ padding: "0 24px 20px" }}>
+            <div style={{ background: C.g50, borderRadius: 12, padding: "4px 16px" }}>
+              {doc.rows.map(([label, value], ri) => (
+                <div key={ri} style={{
+                  display: "flex", padding: "12px 0",
+                  borderBottom: ri < doc.rows.length - 1 ? `1px solid ${C.g100}` : "none",
+                }}>
+                  <span style={{ ...T.t7(500), color: C.g500, width: 48, flexShrink: 0 }}>{label}</span>
+                  <span style={{ ...T.t7(400), color: C.g800 }}>{value}</span>
+                </div>
+              ))}
+            </div>
+            {doc.cta && (
+              <button style={{
+                width: "100%", marginTop: 12, padding: "12px 16px", borderRadius: 12,
+                background: C.b50, border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              }}>
+                {doc.cta.action === "link" && <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke={C.b500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                <span style={{ ...T.t6(500), color: C.b600 }}>{doc.cta.l}</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <SBar />
+      <Nav title="이사 예정 서류" onBack={() => go(from || "b3_sc")} />
+      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
+        <PH title="이사 후에도" accent="보증금을 지킬 수 있어요" desc="임차권등기명령을 신청하면 이사 후에도 대항력이 유지돼요." />
+
+        <div style={{ height: 24 }} />
+
+        {/* 서류 목록 */}
+        {moveDocs.map(doc => <DocRow key={doc.k} doc={doc} />)}
+      </div>
+      <BCTA label="홈으로 돌아가기" onClick={() => go("home_dispute_sent")} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// B4 — 분쟁 경로 비교 + 선택
+// ═══════════════════════════════════════════════════════
+function B4Screen({ go, from, selectedPath, setSelectedPath }) {
+  const [expanded, setExpanded] = useState(selectedPath);
+  const paths = [
+    { id: "med", name: "임대차분쟁조정위원회", one: "비용이 적고, 합의를 유도할 수 있어요", details: [["비용", "1~10만원"], ["기간", "수 주"], ["한계", "상대방 동의 필요 (성립률 약 23%)"]], tags: [{ l: "비용 최소", p: true }, { l: "상대방 동의 필요", p: false }] },
+    { id: "po", name: "지급명령", one: "빠르지만, 이의 시 소송 전환", details: [["비용", "소송의 1/10"], ["기간", "2~4주"], ["한계", "이의 시 소송 자동 전환"]], tags: [{ l: "빠른 진행", p: true }, { l: "이의 시 소송", p: false }] },
+    { id: "sc", name: "소액사건심판", one: "변호사 없이 직접 소송할 수 있어요", details: [["비용", "인지대 10만원 + 송달료"], ["기간", "1~4개월"], ["대상", "보증금 3,000만원 이하"]], tags: [{ l: "직접 소송 가능", p: true }, { l: "강제 집행력", p: true }] },
+  ];
+
+  const handleSelect = (id) => {
+    setSelectedPath(id);
+    setExpanded(expanded === id ? null : id);
+  };
+
+  return (
+    <>
+      <SBar />
+      <Nav title="분쟁 경로 선택" onBack={() => go(from || "home_dispute_sent")} />
+      <div className="no-scrollbar" style={{ flex: 1, overflowY: "auto", paddingBottom: 80 }}>
+        <PH title="보증금을 돌려받는" accent="세 가지 방법" desc="방법을 선택하면 필요한 서류를 알려드려요." />
+        <div style={{ padding: "20px 24px 0" }}>
+          <div style={{ background: C.b50, borderRadius: 16, padding: "16px 20px" }}>
+            <div style={{ ...T.t6(600), color: C.g900, marginBottom: 4 }}>소액사건심판을 추천해요</div>
+            <div style={{ ...T.t7(400), color: C.b600 }}>보증금 {contract.deposit}은 3,000만원 이하예요.<br />변호사 없이 직접 소송할 수 있어요.</div>
+          </div>
+        </div>
+        <div style={{ height: 24 }} />
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ ...T.t7(500), color: C.g600, marginBottom: 12 }}>경로 비교</div>
+          {paths.map(p => (
+            <div key={p.id} style={{ borderRadius: 16, overflow: "hidden", marginBottom: 10, border: selectedPath === p.id ? `2px solid ${C.b500}` : `1px solid ${C.g200}`, transition: "border 0.2s" }}>
+              <button onClick={() => handleSelect(p.id)} style={{
+                width: "100%", textAlign: "left", cursor: "pointer", padding: "14px 16px",
+                background: selectedPath === p.id ? C.b50 : C.w, border: "none", display: "flex", alignItems: "center", gap: 12,
+              }}>
+                <div style={{ width: 20, height: 20, borderRadius: 10, flexShrink: 0, border: selectedPath === p.id ? `6px solid ${C.b500}` : `2px solid ${C.g300}`, background: C.w, transition: "border 0.2s" }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                    <span style={{ ...T.t6(600), color: C.g900 }}>{p.name}</span>
+                    {p.id === "sc" && <span style={{ ...T.s13(600), color: C.b600, background: C.w, padding: "2px 8px", borderRadius: 8 }}>추천</span>}
+                  </div>
+                  <span style={{ ...T.t7(400), color: C.g500 }}>{p.one}</span>
+                </div>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ transform: expanded === p.id ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                  <path d="M5 7.5l5 5 5-5" stroke={C.g400} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              {expanded === p.id && (
+                <div style={{ padding: "0 16px 14px", borderTop: `1px solid ${C.g100}` }}>
+                  <div style={{ paddingTop: 8 }}>
+                    {p.details.map(([l, v], i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0" }}>
+                        <span style={{ ...T.t7(400), color: C.g500, width: 48 }}>{l}</span>
+                        <span style={{ ...T.t7(500), color: C.g800, textAlign: "right", flex: 1 }}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div style={{ height: 24 }} />
+        <div style={{ padding: "0 24px" }}>
+          <div style={{ ...T.t7(500), color: C.g600, marginBottom: 12 }}>혼자 진행하기 어려우면</div>
+          {[{ name: "대한법률구조공단", desc: "무료 법률 상담 · 소송 지원", tag: "무료", tc: C.gn600, tb: C.gn50 },
+            { name: "로톡", desc: "변호사 1:1 상담 · 사건 의뢰", tag: "유료", tc: C.g500, tb: C.g100 }
+          ].map((e, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 16, marginBottom: 10, border: `1px solid ${C.g200}`, cursor: "pointer" }}>
+              <IC bg={C.g50} size={36}><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke={C.g500} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></IC>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                  <span style={{ ...T.t6(500), color: C.g900 }}>{e.name}</span>
+                  <span style={{ ...T.s13(500), color: e.tc, background: e.tb, padding: "2px 6px", borderRadius: 4 }}>{e.tag}</span>
+                </div>
+                <span style={{ ...T.t7(400), color: C.g500 }}>{e.desc}</span>
+              </div>
+              <Chev />
+            </div>
+          ))}
+        </div>
+      </div>
+      <BCTA label="필요 서류 확인하기" onClick={() => go("b3_" + selectedPath)} />
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════════════
+function App() {
+  const [screen, setScreen] = useState("home_pre");
+  const [lastHome, setLastHome] = useState("home_pre");
+  const [selectedPath, setSelectedPath] = useState("sc");
+  const [bank, setBank] = useState("");
+  const [accountNum, setAccountNum] = useState("");
+  const [prevScreen, setPrevScreen] = useState("");
+  const [completedSteps, setCompletedSteps] = useState({ contract: 1 }); // key: checkedAt order (0=not done)
+  const [resetKey, setResetKey] = useState(0);
+  const completeStep = (key) => {
+    setCompletedSteps(prev => {
+      if (prev[key]) return prev;
+      const maxAt = Math.max(0, ...Object.values(prev));
+      return { ...prev, [key]: maxAt + 1 };
+    });
+  };
+  const resetScreen = () => {
+    setCompletedSteps({ contract: 1 });
+    setSelectedPath("sc");
+    setBank("");
+    setAccountNum("");
+    setResetKey(k => k + 1);
+  };
+  const go = (s) => {
+    if (s === "home") { setScreen(lastHome); return; }
+    if (s.startsWith("home_")) setLastHome(s);
+    setPrevScreen(screen);
+    setScreen(s);
+  };
+
+  const isHome = screen.startsWith("home_");
+
+  const screenMap = {
+    home_pre: <HomeScreen go={go} phase="계약 전" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_checked: <HomeScreen go={go} phase="계약 확인 완료" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_post: <HomeScreen go={go} phase="계약 직후" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_post_done: <PostDoneScreen go={go} />,
+    home_live: <HomeScreen go={go} phase="거주 중" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_expiry: <HomeScreen go={go} phase="만기 접근" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_postexpiry: <HomeScreen go={go} phase="만기 도래" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_dispute: <HomeScreen go={go} phase="분쟁 중" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_dispute_pending: <HomeScreen go={go} phase="발송 대기" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_dispute_sent: <HomeScreen go={go} phase="내용증명 발송 완료" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_done: <ContractDoneScreen go={go} />,
+    a0_capture: <A0Capture go={go} />,
+    a0_extracted: <A0Extracted go={go} />,
+    a0_review: <A0Review go={go} from={prevScreen} />,
+    agent_rec: <AgentRec go={go} fromChecked={prevScreen === "home_checked"} />,
+    a2: <A2Screen go={go} completeStep={completeStep} />,
+    a3: <A3Screen go={go} completeStep={completeStep} />,
+    a4_1: <A4_1Screen go={go} />,
+    a4_guide: <A4GuideScreen go={go} />,
+    a4_free: <A4FreeScreen go={go} />,
+    a4_confirm: <A4ConfirmScreen go={go} />,
+    a4_2: <A4_2Screen go={go} completeStep={completeStep} />,
+    a4_sent: <A4SentScreen go={go} completeStep={completeStep} />,
+    b1a_main: <B1aMain go={go} />,
+    b1a_exit: <B1aExit go={go} />,
+    b1a_exit_sent: <B1aExitSent go={go} />,
+    b1a_renew: <B1aRenew go={go} />,
+    home_expiry_done: <HomeScreen go={go} phase="만기 대응 중" completedSteps={completedSteps} completeStep={completeStep} />,
+    home_exit_done: <HomeScreen go={go} phase="퇴거 신청 완료" completedSteps={completedSteps} completeStep={completeStep} />,
+    b1a_result: <B1aResult go={go} />,
+    b1b_main: <B1bMain go={go} />,
+    b1b_dispute: <B1bDispute go={go} />,
+    b2a: <B2aScreen go={go} from={prevScreen} />,
+    b2b: <B2bScreen go={go} />,
+    b2b_agree: <B2bAgree go={go} />,
+    b2b_agree_sent: <B2bAgreeSent go={go} />,
+    b2b_return: <B2bReturn go={go} />,
+    home_agree_wait: <HomeScreen go={go} phase="합의 대기" completedSteps={completedSteps} completeStep={completeStep} />,
+    b21_compose: <B21Compose go={go} from={prevScreen} bank={bank} setBank={setBank} accountNum={accountNum} setAccountNum={setAccountNum} />,
+    b21_preview: <B21Preview go={go} bank={bank} accountNum={accountNum} />,
+    b21_sent: <B21Sent go={go} />,
+    b4: <B4Screen go={go} from={prevScreen} selectedPath={selectedPath} setSelectedPath={setSelectedPath} />,
+    b3_sc: <B3Screen go={go} fixedPath="sc" />,
+    b3_po: <B3Screen go={go} fixedPath="po" />,
+    b3_med: <B3Screen go={go} fixedPath="med" />,
+    b3_move: <B3MoveScreen go={go} from={prevScreen} />,
+  };
+
+  // Group chips by flow
+  const groupColors = { "계약 전": C.b600, "계약 직후": C.b500, "거주 중": C.g700, "만기 접근": C.o600, "만기 도래": C.o800, "분쟁 중": C.r500 };
+  const currentGroup = SCREENS[screen]?.group || GROUPS[0];
+  const [openGroup, setOpenGroup] = useState(currentGroup);
+
+  // 화면 전환 시 해당 그룹 자동 열기
+  useEffect(() => {
+    const g = SCREENS[screen]?.group;
+    if (g) setOpenGroup(g);
+  }, [screen]);
+
+  // ─── 플로우차트 네비게이션 데이터 ───
+  const FLOW_DEFS = {
+    "계약 전": [["home_pre"], ["a0_capture"], ["a0_extracted"], ["a0_review"], ["home_checked"]],
+    "계약 직후": [["home_post"], ["a4_guide"], ["a4_free"], ["a4_confirm"], ["a4_2"], ["a4_sent"], ["home_post_done"]],
+    "거주 중": [["home_live"]],
+    "만기 접근": [["home_expiry"], ["b1a_main"], ["b1a_exit", "b1a_renew"], ["b1a_exit_sent", "__spacer"], ["home_exit_done", "home_expiry_done"], ["__nav_postexpiry", "b1a_result"], ["__nav_live", "__nav_exit_back"]],
+    "만기 도래": [["home_postexpiry"], ["b1b_main"], ["home_done", "b1b_dispute"]],
+    "분쟁 중": [["home_dispute"], ["b2a"], ["b2b", "b21_compose"], ["b2b_agree", "b21_preview"], ["b2b_agree_sent", "b21_sent"], ["home_agree_wait", "home_dispute_sent"], ["b2b_return", "b4"], ["__nav_done", "b3_sc", "b3_po", "b3_med"]],
+  };
+
+  const chipH = 26;
+  const chipGap = 4;
+  const connW = 24;
+  const aS = 4;
+  const calcYs = (n, H) => {
+    const total = n * chipH + (n - 1) * chipGap;
+    const start = (H - total) / 2;
+    return Array.from({ length: n }, (_, i) => start + chipH / 2 + i * (chipH + chipGap));
+  };
+
+  const FlowConn = ({ pN, nN, H, gc }) => {
+    if (pN === 1 && nN === 1) {
+      const y = H / 2;
+      return <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+        <line x1={0} y1={y} x2={connW - aS} y2={y} stroke={gc} strokeWidth={1.5} />
+        <polygon points={`${connW},${y} ${connW - aS * 1.5},${y - aS} ${connW - aS * 1.5},${y + aS}`} fill={gc} />
+      </svg>;
+    }
+    const lYs = calcYs(pN, H);
+    const rYs = calcYs(nN, H);
+    const minY = Math.min(...lYs, ...rYs);
+    const maxY = Math.max(...lYs, ...rYs);
+    return <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+      {lYs.map((y, i) => <line key={`l${i}`} x1={0} y1={y} x2={connW / 2} y2={y} stroke={gc} strokeWidth={1.5} />)}
+      <line x1={connW / 2} y1={minY} x2={connW / 2} y2={maxY} stroke={gc} strokeWidth={1.5} />
+      {rYs.map((y, i) => (
+        <g key={`r${i}`}>
+          <line x1={connW / 2} y1={y} x2={connW - aS} y2={y} stroke={gc} strokeWidth={1.5} />
+          <polygon points={`${connW},${y} ${connW - aS * 1.5},${y - aS} ${connW - aS * 1.5},${y + aS}`} fill={gc} />
+        </g>
+      ))}
+    </svg>;
+  };
+
+  return (
+    <div style={{
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      background: C.g100, minHeight: "100vh",
+    }}>
+      {/* ─── 상단 칩 네비게이션 ─── */}
+      <style>{`.chip-nav::-webkit-scrollbar{display:none}.chip-nav{-ms-overflow-style:none;scrollbar-width:none}`}</style>
+      <div style={{
+        position: "sticky", top: 0, zIndex: 200, background: C.w,
+        borderBottom: `1px solid ${C.g200}`,
+      }}>
+        {/* 1단: 그룹 버튼 */}
+        <div className="chip-nav" style={{ display: "flex", gap: 6, padding: "8px 12px", overflowX: "auto" }}>
+          {GROUPS.map(group => {
+            const isActive = openGroup === group;
+            const isCurrent = currentGroup === group;
+            const gc = groupColors[group] || C.g600;
+            return (
+              <button key={group} onClick={() => setOpenGroup(isActive ? null : group)} style={{
+                padding: "6px 12px", borderRadius: 20, border: "none", cursor: "pointer",
+                ...T.t7(isActive || isCurrent ? 600 : 400), whiteSpace: "nowrap",
+                background: isActive ? gc : "transparent",
+                color: isActive ? C.w : isCurrent ? gc : C.g500,
+                transition: "all 0.15s", flexShrink: 0,
+                boxShadow: !isActive && isCurrent ? `inset 0 0 0 1.5px ${gc}` : "none",
+              }}>{group}</button>
+            );
+          })}
+        </div>
+        {/* 2단: 플로우차트 */}
+        {openGroup && FLOW_DEFS[openGroup] && (() => {
+          const flow = FLOW_DEFS[openGroup];
+          const gc = groupColors[openGroup] || C.g600;
+          const maxN = Math.max(...flow.map(col => col.length), openGroup === "계약 전" || openGroup === "계약 직후" ? 3 : 1);
+          const disputeExtra = openGroup === "분쟁 중" ? 16 : 0;
+          const H = maxN * chipH + (maxN - 1) * chipGap + 8 + disputeExtra;
+          return (
+            <div className="chip-nav" style={{ display: "flex", alignItems: "stretch", padding: "0 12px 8px", overflowX: "auto" }}>
+              {flow.map((col, ci) => (
+                <React.Fragment key={ci}>
+                  <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: (openGroup === "분쟁 중" && ci === 2) ? chipGap + disputeExtra : chipGap, height: H, flexShrink: 0, alignItems: "center", position: "relative" }}>
+                    {col.map(id => id === "__spacer" ? (
+                      <div key={id} style={{ height: chipH, flexShrink: 0, display: "flex", alignItems: "center", alignSelf: "stretch" }}>
+                        <div style={{ flex: 1, height: 1.5, background: C.g300 }} />
+                      </div>
+                    ) : id.startsWith("__nav_") ? (
+                      <button key={id} onClick={() => { const t = { __nav_done: "home_done", __nav_live: "home_live", __nav_exit_back: "b1a_exit", __nav_postexpiry: "home_postexpiry" }[id]; if (t) go(t); }} style={{
+                        padding: "4px 10px", borderRadius: 8, border: "none",
+                        background: "linear-gradient(135deg, #e8f3ff, #c9e2ff)",
+                        cursor: "pointer",
+                        ...T.s13(500), whiteSpace: "nowrap", height: chipH,
+                        color: C.b700, transition: "all 0.15s", flexShrink: 0,
+                        display: "flex", alignItems: "center", gap: 4,
+                      }}>
+                        {SCREENS[id]?.label || id}
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke={C.b700} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                    ) : (
+                      <button key={id} onClick={() => go(id)} style={{
+                        padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer",
+                        ...T.s13(screen === id ? 600 : 400), whiteSpace: "nowrap", height: chipH,
+                        background: screen === id ? gc : C.g100,
+                        color: screen === id ? C.w : C.g600,
+                        transition: "all 0.15s", flexShrink: 0,
+                      }}>{SCREENS[id]?.label || id}</button>
+                    ))}
+                    {/* 분쟁 중: 반환 의사 → 내용증명 작성 열 내부 하향 화살표 */}
+                    {openGroup === "분쟁 중" && ci === 2 && col.length === 2 && (() => {
+                      const customGap = chipGap + disputeExtra;
+                      const contentH = 2 * chipH + customGap;
+                      const startY = (H - contentH) / 2;
+                      const arrowTop = startY + chipH + 2;
+                      const arrowBot = startY + chipH + customGap - 2;
+                      const mx = 4;
+                      return (
+                        <svg width="8" height={H} style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", pointerEvents: "none", overflow: "visible", zIndex: 1 }}>
+                          <line x1={mx} y1={arrowTop} x2={mx} y2={arrowBot - 3} stroke={C.g400} strokeWidth="1.5" />
+                          <polygon points={`${mx},${arrowBot} ${mx - 3},${arrowBot - 5} ${mx + 3},${arrowBot - 5}`} fill={C.g400} />
+                        </svg>
+                      );
+                    })()}
+                  </div>
+                  {ci < flow.length - 1 && !(openGroup === "계약 직후" && (ci === 0 || ci === flow.length - 2)) && !(openGroup === "만기 접근" && ci >= 2) && !(openGroup === "분쟁 중" && (ci === 1 || ci === 2 || ci === 3 || ci === 4 || ci === 5 || ci === 6)) && <FlowConn pN={col.length} nN={flow[ci + 1].length} H={H} gc={C.g300} />}
+                  {/* 분쟁 중: b2a(1개) → [b2b, b21_compose](2개, 커스텀 gap) 커스텀 커넥터 */}
+                  {openGroup === "분쟁 중" && ci === 1 && (() => {
+                    const leftY = H / 2;
+                    const customGap = chipGap + disputeExtra;
+                    const contentH = 2 * chipH + customGap;
+                    const startY = (H - contentH) / 2;
+                    const rTop = startY + chipH / 2;
+                    const rBot = startY + chipH + customGap + chipH / 2;
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        <line x1={0} y1={leftY} x2={connW / 2} y2={leftY} stroke={C.g300} strokeWidth={1.5} />
+                        <line x1={connW / 2} y1={rTop} x2={connW / 2} y2={rBot} stroke={C.g300} strokeWidth={1.5} />
+                        {[rTop, rBot].map((y, i) => (
+                          <g key={i}>
+                            <line x1={connW / 2} y1={y} x2={connW - aS} y2={y} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${y} ${connW - aS * 1.5},${y - aS} ${connW - aS * 1.5},${y + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 분쟁 중: [b2b, b21_compose](커스텀) → [b2b_agree, b21_preview](표준) 커스텀 커넥터 */}
+                  {openGroup === "분쟁 중" && ci === 2 && (() => {
+                    const customGap = chipGap + disputeExtra;
+                    const contentH = 2 * chipH + customGap;
+                    const startY = (H - contentH) / 2;
+                    const lTop = startY + chipH / 2;
+                    const lBot = startY + chipH + customGap + chipH / 2;
+                    const rYs = calcYs(2, H);
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {[[lTop, rYs[0]], [lBot, rYs[1]]].map(([ly, ry], i) => (
+                          <g key={i}>
+                            <line x1={0} y1={ly} x2={connW - aS} y2={ry} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${ry} ${connW - aS * 1.5},${ry - aS} ${connW - aS * 1.5},${ry + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 분쟁 중: [b2b_agree, b21_preview](2) → [b2b_agree_sent, b21_sent](2) 독립 병렬 */}
+                  {openGroup === "분쟁 중" && ci === 3 && (() => {
+                    const lYs = calcYs(2, H);
+                    const rYs = calcYs(2, H);
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {lYs.map((y, i) => (
+                          <g key={i}>
+                            <line x1={0} y1={y} x2={connW - aS} y2={rYs[i]} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${rYs[i]} ${connW - aS * 1.5},${rYs[i] - aS} ${connW - aS * 1.5},${rYs[i] + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 분쟁 중: [b2b_agree_sent, b21_sent](2) → [home_agree_wait, home_dispute_sent](2) 독립 병렬 */}
+                  {openGroup === "분쟁 중" && ci === 4 && (() => {
+                    const lYs = calcYs(2, H);
+                    const rYs = calcYs(2, H);
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {lYs.map((y, i) => (
+                          <g key={i}>
+                            <line x1={0} y1={y} x2={connW - aS} y2={rYs[i]} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${rYs[i]} ${connW - aS * 1.5},${rYs[i] - aS} ${connW - aS * 1.5},${rYs[i] + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 분쟁 중: [home_agree_wait, home_dispute_sent](2) → [b2b_return, b4](2) 독립 병렬 */}
+                  {openGroup === "분쟁 중" && ci === 5 && (() => {
+                    const lYs = calcYs(2, H);
+                    const rYs = calcYs(2, H);
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {lYs.map((y, i) => (
+                          <g key={i}>
+                            <line x1={0} y1={y} x2={connW - aS} y2={rYs[i]} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${rYs[i]} ${connW - aS * 1.5},${rYs[i] - aS} ${connW - aS * 1.5},${rYs[i] + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 분쟁 중: [b2b_return, b4](2) → [__nav_done, b3_sc, b3_po, b3_med](4) 독립 경로 */}
+                  {openGroup === "분쟁 중" && ci === 6 && (() => {
+                    const lYs = calcYs(2, H);
+                    const rYs = calcYs(4, H);
+                    const elbowX = 6;
+                    const fanX = connW / 2 + 3;
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {/* b2b_return → __nav_done: ㄱ자 꺾임 (별도 x축) */}
+                        <line x1={0} y1={lYs[0]} x2={elbowX} y2={lYs[0]} stroke={C.g300} strokeWidth={1.5} />
+                        <line x1={elbowX} y1={lYs[0]} x2={elbowX} y2={rYs[0]} stroke={C.g300} strokeWidth={1.5} />
+                        <line x1={elbowX} y1={rYs[0]} x2={connW - aS} y2={rYs[0]} stroke={C.g300} strokeWidth={1.5} />
+                        <polygon points={`${connW},${rYs[0]} ${connW - aS * 1.5},${rYs[0] - aS} ${connW - aS * 1.5},${rYs[0] + aS}`} fill={C.g300} />
+                        {/* b4 → b3_sc, b3_po, b3_med: 1-to-3 팬 (별도 x축) */}
+                        <line x1={0} y1={lYs[1]} x2={fanX} y2={lYs[1]} stroke={C.g300} strokeWidth={1.5} />
+                        <line x1={fanX} y1={rYs[1]} x2={fanX} y2={rYs[3]} stroke={C.g300} strokeWidth={1.5} />
+                        {[rYs[1], rYs[2], rYs[3]].map((y, i) => (
+                          <g key={i}>
+                            <line x1={fanX} y1={y} x2={connW - aS} y2={y} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${y} ${connW - aS * 1.5},${y - aS} ${connW - aS * 1.5},${y + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 만기 접근: 분기 후 커스텀 커넥터 — 상단(퇴거) / 하단(연장) 병렬 경로 */}
+                  {openGroup === "만기 접근" && ci === 2 && (() => {
+                    const ys2 = calcYs(2, H);
+                    const topY = ys2[0];
+                    const botY = ys2[1];
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {/* 퇴거통보(top) → 퇴거발송확인(top) */}
+                        <line x1={0} y1={topY} x2={connW - aS} y2={topY} stroke={C.g300} strokeWidth={1.5} />
+                        <polygon points={`${connW},${topY} ${connW - aS * 1.5},${topY - aS} ${connW - aS * 1.5},${topY + aS}`} fill={C.g300} />
+                        {/* 연장안내(bottom) → 하단 경로 시작 */}
+                        <line x1={0} y1={botY} x2={connW} y2={botY} stroke={C.g300} strokeWidth={1.5} />
+                      </svg>
+                    );
+                  })()}
+                  {openGroup === "만기 접근" && ci === 3 && (() => {
+                    const ys2 = calcYs(2, H);
+                    const topY = ys2[0];
+                    const botY = ys2[1];
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {/* 퇴거발송확인(top) → 홈 퇴거완료(top) */}
+                        <line x1={0} y1={topY} x2={connW - aS} y2={topY} stroke={C.g300} strokeWidth={1.5} />
+                        <polygon points={`${connW},${topY} ${connW - aS * 1.5},${topY - aS} ${connW - aS * 1.5},${topY + aS}`} fill={C.g300} />
+                        {/* 연장안내 하단 경로 → 홈 대응후(bottom) */}
+                        <line x1={0} y1={botY} x2={connW - aS} y2={botY} stroke={C.g300} strokeWidth={1.5} />
+                        <polygon points={`${connW},${botY} ${connW - aS * 1.5},${botY - aS} ${connW - aS * 1.5},${botY + aS}`} fill={C.g300} />
+                      </svg>
+                    );
+                  })()}
+                  {/* 만기 접근: [home_exit_done, home_expiry_done](2) → [__nav_postexpiry, b1a_result](2) — 병렬 */}
+                  {openGroup === "만기 접근" && ci === 4 && (() => {
+                    const lYs = calcYs(2, H);
+                    const rYs = calcYs(2, H);
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        {lYs.map((y, i) => (
+                          <g key={i}>
+                            <line x1={0} y1={y} x2={connW - aS} y2={rYs[i]} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${rYs[i]} ${connW - aS * 1.5},${rYs[i] - aS} ${connW - aS * 1.5},${rYs[i] + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 만기 접근: [__spacer, b1a_result](2) → [__nav_live, __nav_exit_back](2) — 하단→양쪽 분기 */}
+                  {openGroup === "만기 접근" && ci === 5 && (() => {
+                    const lYs = calcYs(2, H);
+                    const rYs = calcYs(2, H);
+                    return (
+                      <svg width={connW} height={H} style={{ flexShrink: 0, display: "block" }}>
+                        <line x1={0} y1={lYs[1]} x2={connW / 2} y2={lYs[1]} stroke={C.g300} strokeWidth={1.5} />
+                        <line x1={connW / 2} y1={rYs[0]} x2={connW / 2} y2={rYs[1]} stroke={C.g300} strokeWidth={1.5} />
+                        {rYs.map((y, i) => (
+                          <g key={i}>
+                            <line x1={connW / 2} y1={y} x2={connW - aS} y2={y} stroke={C.g300} strokeWidth={1.5} />
+                            <polygon points={`${connW},${y} ${connW - aS * 1.5},${y - aS} ${connW - aS * 1.5},${y + aS}`} fill={C.g300} />
+                          </g>
+                        ))}
+                      </svg>
+                    );
+                  })()}
+                  {/* 계약 직후: 홈 → (+) Fork → 3 병렬 → 메인 플로우 ... → (+) Join → 보호 완료 */}
+                  {openGroup === "계약 직후" && ci === 0 && (() => {
+                    const bH = H;
+                    const ys = calcYs(3, bH);
+                    const midY = ys[1];
+                    const gateR = 10;
+                    return (
+                      <>
+                        {/* 홈 → (+) Fork 게이트 — SVG를 flex 자식으로 직접 배치 */}
+                        <svg width={connW + gateR * 2 + connW} height={bH} style={{ flexShrink: 0, display: "block", overflow: "visible" }}>
+                          {/* 인입 라인: x=0(홈 칩 바로 옆)부터 원 왼쪽까지 끊김 없이 */}
+                          <line x1={0} y1={midY} x2={connW} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                          {/* 삼갈래 수직 바 — 원 중심 관통 */}
+                          <line x1={connW + gateR} y1={ys[0]} x2={connW + gateR} y2={ys[2]} stroke={C.g300} strokeWidth={1.5} />
+                          {/* 수평 분기선 */}
+                          {ys.map((y, i) => <line key={i} x1={connW + gateR} y1={y} x2={connW + gateR * 2 + connW} y2={y} stroke={C.g300} strokeWidth={1.5} />)}
+                          {/* (+) 원 — 위에 덮기 */}
+                          <circle cx={connW + gateR} cy={midY} r={gateR} fill={C.w} stroke={C.g300} strokeWidth={1.5} />
+                          <line x1={connW + gateR - 4} y1={midY} x2={connW + gateR + 4} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                          <line x1={connW + gateR} y1={midY - 4} x2={connW + gateR} y2={midY + 4} stroke={C.g300} strokeWidth={1.5} />
+                        </svg>
+                        {/* 3개 칩 열 */}
+                        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: chipGap, height: bH, flexShrink: 0, alignItems: "center" }}>
+                          {[["a3", SCREENS.a3?.label], ["a4_1", SCREENS.a4_1?.label], ["a2", SCREENS.a2?.label]].map(([id, label]) => (
+                            <button key={id} onClick={() => go(id)} style={{
+                              padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer",
+                              ...T.s13(screen === id ? 600 : 400), whiteSpace: "nowrap", height: chipH,
+                              background: screen === id ? gc : C.g100, color: screen === id ? C.w : C.g600,
+                              transition: "all 0.15s", flexShrink: 0,
+                            }}>{label}</button>
+                          ))}
+                        </div>
+                        {/* 중간 칩(촬영 브리핑)에서만 다음으로 연결 */}
+                        <FlowConn pN={1} nN={1} H={bH} gc={C.g300} />
+                      </>
+                    );
+                  })()}
+                  {/* 계약 직후: ... → 전송완료 → (+) Join → 보호완료 */}
+                  {openGroup === "계약 직후" && ci === flow.length - 2 && (() => {
+                    const bH = H;
+                    const midY = bH / 2;
+                    const gateR = 10;
+                    return (
+                      <svg width={connW + gateR * 2} height={bH} style={{ flexShrink: 0, display: "block", overflow: "visible" }}>
+                          <line x1={0} y1={midY} x2={connW / 2} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                          <line x1={connW / 2 + gateR} y1={midY} x2={connW / 2 + gateR} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                          <circle cx={connW / 2 + gateR} cy={midY} r={gateR} fill={C.w} stroke={C.g300} strokeWidth={1.5} />
+                          <line x1={connW / 2 + gateR - 4} y1={midY} x2={connW / 2 + gateR + 4} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                          <line x1={connW / 2 + gateR} y1={midY - 4} x2={connW / 2 + gateR} y2={midY + 4} stroke={C.g300} strokeWidth={1.5} />
+                          <line x1={connW / 2 + gateR * 2} y1={midY} x2={connW + gateR * 2 - aS} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                          <polygon points={`${connW + gateR * 2},${midY} ${connW + gateR * 2 - aS * 1.5},${midY - aS} ${connW + gateR * 2 - aS * 1.5},${midY + aS}`} fill={C.g300} />
+                        </svg>
+                    );
+                  })()}
+                </React.Fragment>
+              ))}
+              {/* 계약 전: 검토 완료 뒤 분기 — 위: 계약 직후(그룹 전환), 아래: 중개사 추천 */}
+              {openGroup === "계약 전" && (() => {
+                const bH = H;
+                const topY = bH / 2 - chipH / 2 - chipGap / 2;
+                const botY = bH / 2 + chipH / 2 + chipGap / 2;
+                const midY = bH / 2;
+                return (
+                  <>
+                    <svg width={connW} height={bH} style={{ flexShrink: 0, display: "block" }}>
+                      {/* 메인 실선 */}
+                      <line x1={0} y1={midY} x2={connW / 2} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                      <line x1={connW / 2} y1={topY} x2={connW / 2} y2={botY} stroke={C.g300} strokeWidth={1.5} />
+                      {/* 위: 계약 직후 — 실선 + 화살촉 */}
+                      <line x1={connW / 2} y1={topY} x2={connW - aS} y2={topY} stroke={C.g300} strokeWidth={1.5} />
+                      <polygon points={`${connW},${topY} ${connW - aS * 1.5},${topY - aS} ${connW - aS * 1.5},${topY + aS}`} fill={C.g300} />
+                      {/* 아래: 중개사 추천 — 실선 + 화살촉 */}
+                      <line x1={connW / 2} y1={botY} x2={connW - aS} y2={botY} stroke={C.g300} strokeWidth={1.5} />
+                      <polygon points={`${connW},${botY} ${connW - aS * 1.5},${botY - aS} ${connW - aS * 1.5},${botY + aS}`} fill={C.g300} />
+                    </svg>
+                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: chipGap, height: bH, flexShrink: 0, alignItems: "center" }}>
+                      {/* 그룹 전환 배지 — 계약 직후 색상 pill, 클릭 시 해당 그룹 열기 */}
+                      <button onClick={() => setOpenGroup("계약 직후")} style={{
+                        padding: "4px 10px", borderRadius: 8, border: "none",
+                        background: "linear-gradient(135deg, #e8f3ff, #c9e2ff)",
+                        cursor: "pointer",
+                        ...T.s13(500), whiteSpace: "nowrap", height: chipH,
+                        color: C.b700,
+                        transition: "all 0.15s", flexShrink: 0,
+                        display: "flex", alignItems: "center", gap: 4,
+                      }}>
+                        계약 직후
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke={C.b700} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                      <button onClick={() => go("agent_rec")} style={{
+                        padding: "4px 10px", borderRadius: 8, border: "none", cursor: "pointer",
+                        ...T.s13(screen === "agent_rec" ? 600 : 400), whiteSpace: "nowrap", height: chipH,
+                        background: screen === "agent_rec" ? gc : C.g100,
+                        color: screen === "agent_rec" ? C.w : C.g600,
+                        transition: "all 0.15s", flexShrink: 0,
+                      }}>{SCREENS.agent_rec?.label}</button>
+                    </div>
+                  </>
+                );
+              })()}
+              {/* 계약 직후: 보호 완료 뒤 → 거주 중 그룹 전환 */}
+              {openGroup === "계약 직후" && (() => {
+                const bH = H;
+                const midY = bH / 2;
+                return (
+                  <>
+                    <svg width={connW} height={bH} style={{ flexShrink: 0, display: "block" }}>
+                      <line x1={0} y1={midY} x2={connW - aS} y2={midY} stroke={C.g300} strokeWidth={1.5} />
+                      <polygon points={`${connW},${midY} ${connW - aS * 1.5},${midY - aS} ${connW - aS * 1.5},${midY + aS}`} fill={C.g300} />
+                    </svg>
+                    <div style={{ display: "flex", alignItems: "center", height: bH, flexShrink: 0 }}>
+                      <button onClick={() => go("home_live")} style={{
+                        padding: "4px 10px", borderRadius: 8, border: "none",
+                        background: "linear-gradient(135deg, #e8f3ff, #c9e2ff)",
+                        cursor: "pointer",
+                        ...T.s13(500), whiteSpace: "nowrap", height: chipH,
+                        color: C.b700,
+                        transition: "all 0.15s", flexShrink: 0,
+                        display: "flex", alignItems: "center", gap: 4,
+                      }}>
+                        거주 중
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke={C.b700} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+              {/* 만기 도래: 계약 마무리 → 계약 전, 미반환 안내 → 분쟁 중 그룹 전환 */}
+              {openGroup === "만기 도래" && (() => {
+                const bH = H;
+                const ys2 = calcYs(2, bH);
+                const topY = ys2[0];
+                const botY = ys2[1];
+                return (
+                  <>
+                    <svg width={connW} height={bH} style={{ flexShrink: 0, display: "block" }}>
+                      <line x1={0} y1={topY} x2={connW - aS} y2={topY} stroke={C.g300} strokeWidth={1.5} />
+                      <polygon points={`${connW},${topY} ${connW - aS * 1.5},${topY - aS} ${connW - aS * 1.5},${topY + aS}`} fill={C.g300} />
+                      <line x1={0} y1={botY} x2={connW - aS} y2={botY} stroke={C.g300} strokeWidth={1.5} />
+                      <polygon points={`${connW},${botY} ${connW - aS * 1.5},${botY - aS} ${connW - aS * 1.5},${botY + aS}`} fill={C.g300} />
+                    </svg>
+                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: chipGap, height: bH, flexShrink: 0, alignItems: "center" }}>
+                      <button onClick={() => go("home_pre")} style={{
+                        padding: "4px 10px", borderRadius: 8, border: "none",
+                        background: "linear-gradient(135deg, #e8f3ff, #c9e2ff)",
+                        cursor: "pointer",
+                        ...T.s13(500), whiteSpace: "nowrap", height: chipH,
+                        color: C.b700, transition: "all 0.15s", flexShrink: 0,
+                        display: "flex", alignItems: "center", gap: 4,
+                      }}>
+                        계약 전
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke={C.b700} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                      <button onClick={() => go("home_dispute")} style={{
+                        padding: "4px 10px", borderRadius: 8, border: "none",
+                        background: "linear-gradient(135deg, #e8f3ff, #c9e2ff)",
+                        cursor: "pointer",
+                        ...T.s13(500), whiteSpace: "nowrap", height: chipH,
+                        color: C.b700, transition: "all 0.15s", flexShrink: 0,
+                        display: "flex", alignItems: "center", gap: 4,
+                      }}>
+                        분쟁 중
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke={C.b700} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* ─── 디바이스 프레임 ─── */}
+      <div style={{ display: "flex", justifyContent: "center", padding: "20px 0 40px" }}>
+        <div style={{ position: "relative" }}>
+          <div style={{
+            width: 393, height: 852, background: C.w,
+            borderRadius: 24, overflow: "hidden",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+            display: "flex", flexDirection: "column",
+            position: "relative",
+          }}>
+            <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}.no-scrollbar *::-webkit-scrollbar{display:none}.no-scrollbar *{-ms-overflow-style:none;scrollbar-width:none}`}</style>
+            <div key={resetKey} className="no-scrollbar" style={{ display: "flex", flexDirection: "column", flex: 1, overflowY: "auto" }}>
+              {screenMap[screen]}
+            </div>
+          </div>
+          {/* 리셋 버튼 */}
+          <button onClick={resetScreen} title="현재 화면 초기화" style={{
+            position: "absolute", top: 12, right: -52,
+            width: 36, height: 36, borderRadius: 18,
+            background: C.g100, border: `1px solid ${C.g200}`,
+            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "background 0.15s",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = C.g200}
+          onMouseLeave={e => e.currentTarget.style.background = C.g100}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M1 4v6h6M23 20v-6h-6" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" stroke={C.g400} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
