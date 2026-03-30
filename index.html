@@ -3299,16 +3299,29 @@ function App() {
 
       {/* ─── 디바이스 프레임 ─── */}
       <div className="device-outer">
-        <div
-          className="device-frame"
-          style={{
-            transformOrigin: "top center",
+        {/* 외부: 시각적 크기만 담당 (border-radius, shadow, overflow clip) */}
+        <div style={{
+          width: Math.round(FRAME_W * frameScale),
+          height: Math.round(FRAME_H * frameScale),
+          borderRadius: frameScale < 1 ? 20 : 24,
+          overflow: "hidden",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+          flexShrink: 0,
+          background: C.w,
+        }}>
+          {/* 내부: 실제 390×844 레이아웃 — transform만 적용, sticky 정상 동작 */}
+          <div style={{
+            width: FRAME_W,
+            height: FRAME_H,
             transform: `scale(${frameScale})`,
-            marginBottom: frameScale < 1 ? `${Math.round(FRAME_H * (frameScale - 1))}px` : 0,
-          }}
-        >
-          <div key={resetKey} className="no-scrollbar" style={{ display: "flex", flexDirection: "column", flex: 1, overflowY: "auto" }}>
-            {screenMap[screen]}
+            transformOrigin: "top left",
+            display: "flex",
+            flexDirection: "column",
+            background: C.w,
+          }}>
+            <div key={resetKey} className="no-scrollbar" style={{ display: "flex", flexDirection: "column", flex: 1, overflowY: "auto" }}>
+              {screenMap[screen]}
+            </div>
           </div>
         </div>
       </div>
